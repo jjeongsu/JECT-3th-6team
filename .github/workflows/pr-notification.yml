@@ -59,16 +59,25 @@ jobs:
             const author = pr.user.login;
             const reviewers = pr.requested_reviewers.map(r => r.login);
             
-            if (reviewers.length === 0) {
-              throw new Error('리뷰어가 지정되지 않았습니다. PR에 리뷰어를 지정해주세요.');
-            }
-            
             // Get GitHub to Discord ID mapping from secrets
             const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
+            const authorReviewerMapping = JSON.parse(process.env.AUTHOR_REVIEWER_MAPPING);
             
             // Get Discord IDs
             const authorDiscordId = idMapping[author] || author;
-            const reviewerDiscordIds = reviewers.map(r => idMapping[r] || r);
+            let reviewerDiscordIds;
+            
+            if (reviewers.length > 0) {
+              // 명시적으로 지정된 리뷰어가 있는 경우
+              reviewerDiscordIds = reviewers.map(r => idMapping[r] || r);
+            } else {
+              // 리뷰어가 지정되지 않은 경우, 작성자별 기본 리뷰어 사용
+              const defaultReviewer = authorReviewerMapping[author];
+              if (!defaultReviewer) {
+                throw new Error(`${author}님의 기본 리뷰어가 설정되지 않았습니다.`);
+              }
+              reviewerDiscordIds = [idMapping[defaultReviewer] || defaultReviewer];
+            }
             
             const reviewerMentions = reviewerDiscordIds.map(id => `<@${id}>`).join(', ');
             const authorMention = `<@${authorDiscordId}>`;
@@ -104,4 +113,5 @@ jobs:
             });
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }} 
+          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }}
+          AUTHOR_REVIEWER_MAPPING: ${{ secrets.AUTHOR_REVIEWER_MAPPING }} 
