@@ -59,15 +59,16 @@ jobs:
             const author = pr.user.login;
             const reviewers = pr.requested_reviewers.map(r => r.login);
             
+            if (reviewers.length === 0) {
+              throw new Error('리뷰어가 지정되지 않았습니다. PR에 리뷰어를 지정해주세요.');
+            }
+            
             // Get GitHub to Discord ID mapping from secrets
             const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
-            const reviewerMapping = JSON.parse(process.env.REVIEWER_MAPPING);
             
             // Get Discord IDs
             const authorDiscordId = idMapping[author] || author;
-            const reviewerDiscordIds = reviewers.length > 0 
-              ? reviewers.map(r => idMapping[r] || r)
-              : reviewerMapping[pr.base.ref] || [];
+            const reviewerDiscordIds = reviewers.map(r => idMapping[r] || r);
             
             const reviewerMentions = reviewerDiscordIds.map(id => `<@${id}>`).join(', ');
             const authorMention = `<@${authorDiscordId}>`;
@@ -103,5 +104,4 @@ jobs:
             });
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }}
-          REVIEWER_MAPPING: ${{ secrets.REVIEWER_MAPPING }} 
+          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }} 
