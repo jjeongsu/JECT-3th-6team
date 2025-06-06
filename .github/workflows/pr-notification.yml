@@ -1,0 +1,107 @@
+name: PR Notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get PR information
+        id: pr_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const project = await github.rest.projects.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            });
+            
+            // Get project fields for the PR
+            const projectItems = await github.rest.projects.listProjectItems({
+              project_id: project.data[0].id,
+            });
+            
+            const prItem = projectItems.data.find(item => 
+              item.content_url === pr.html_url
+            );
+            
+            if (!prItem) {
+              return {
+                review_due_date: 'Not set',
+                merge_due_date: 'Not set'
+              };
+            }
+            
+            const fields = await github.rest.projects.listProjectItemFields({
+              project_id: project.data[0].id,
+              item_id: prItem.id,
+            });
+            
+            const reviewDueDate = fields.data.find(field => field.name === '리뷰 마감일')?.value || 'Not set';
+            const mergeDueDate = fields.data.find(field => field.name === '머지 예정일')?.value || 'Not set';
+            
+            return {
+              review_due_date: reviewDueDate,
+              merge_due_date: mergeDueDate
+            };
+
+      - name: Send Discord notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const author = pr.user.login;
+            const reviewers = pr.requested_reviewers.map(r => r.login);
+            
+            // Get GitHub to Discord ID mapping from secrets
+            const idMapping = JSON.parse(process.env.GITHUB_DISCORD_MAPPING);
+            const reviewerMapping = JSON.parse(process.env.REVIEWER_MAPPING);
+            
+            // Get Discord IDs
+            const authorDiscordId = idMapping[author] || author;
+            const reviewerDiscordIds = reviewers.length > 0 
+              ? reviewers.map(r => idMapping[r] || r)
+              : reviewerMapping[pr.base.ref] || [];
+            
+            const reviewerMentions = reviewerDiscordIds.map(id => `<@${id}>`).join(', ');
+            const authorMention = `<@${authorDiscordId}>`;
+            
+            const message = {
+              embeds: [{
+                title: pr.title,
+                url: pr.html_url,
+                color: 0x5865F2,
+                fields: [
+                  {
+                    name: 'Review Request',
+                    value: `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`
+                  },
+                  {
+                    name: 'Review Due Date',
+                    value: '${{ steps.pr_info.outputs.review_due_date }}'
+                  },
+                  {
+                    name: 'Merge Due Date',
+                    value: '${{ steps.pr_info.outputs.merge_due_date }}'
+                  }
+                ]
+              }]
+            };
+            
+            await fetch(process.env.DISCORD_WEBHOOK_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(message),
+            });
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_DISCORD_MAPPING: ${{ secrets.GITHUB_DISCORD_MAPPING }}
+          REVIEWER_MAPPING: ${{ secrets.REVIEWER_MAPPING }} 
