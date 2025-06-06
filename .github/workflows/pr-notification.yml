@@ -63,6 +63,14 @@ jobs:
             const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
             const authorReviewerMapping = JSON.parse(process.env.AUTHOR_REVIEWER_MAPPING);
             
+            // Set PR author as assignee
+            await github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              assignees: [author]
+            });
+            
             // Get Discord IDs
             const authorDiscordId = idMapping[author] || author;
             let reviewerDiscordIds;
@@ -77,6 +85,14 @@ jobs:
                 throw new Error(`${author}님의 기본 리뷰어가 설정되지 않았습니다.`);
               }
               reviewerDiscordIds = [idMapping[defaultReviewer] || defaultReviewer];
+              
+              // 기본 리뷰어를 PR에 자동으로 지정
+              await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                reviewers: [defaultReviewer]
+              });
             }
             
             const reviewerMentions = reviewerDiscordIds.map(id => `<@${id}>`).join(', ');
