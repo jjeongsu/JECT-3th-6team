@@ -60,7 +60,7 @@ jobs:
             const reviewers = pr.requested_reviewers.map(r => r.login);
             
             // Get GitHub to Discord ID mapping from secrets
-            const idMapping = JSON.parse(process.env.GITHUB_DISCORD_MAPPING);
+            const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
             const reviewerMapping = JSON.parse(process.env.REVIEWER_MAPPING);
             
             // Get Discord IDs
@@ -103,5 +103,5 @@ jobs:
             });
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          GITHUB_DISCORD_MAPPING: ${{ secrets.GITHUB_DISCORD_MAPPING }}
+          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }}
           REVIEWER_MAPPING: ${{ secrets.REVIEWER_MAPPING }} 
