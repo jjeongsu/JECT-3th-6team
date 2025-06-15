@@ -86,15 +86,14 @@ jobs:
             const reviewers = pr.requested_reviewers.map(r => r.login);
             
             // Get GitHub to Discord ID mapping from secrets
-            let idMapping;
+            let idMapping = {};
+            let authorReviewerMapping = {};
+            
             try {
-              const mappingStr = ${{ secrets.USERNAME_DISCORD_MAPPING }}
-              console.log(mappingStr);
-              if (!mappingStr) {
-                
+              if (!process.env.USERNAME_DISCORD_MAPPING) {
                 throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
               }
-              idMapping = JSON.parse(mappingStr);
+              idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
               if (typeof idMapping !== 'object' || idMapping === null) {
                 throw new Error('USERNAME_DISCORD_MAPPING이 올바른 JSON 객체가 아닙니다.');
               }
@@ -103,14 +102,11 @@ jobs:
               throw new Error(`시크릿 파싱 에러: ${error.message}`);
             }
             
-            let authorReviewerMapping;
             try {
-              const mappingStr = ${{ secrets.AUTHOR_REVIEWER_MAPPING }}
-              console.log(mappingStr);
-              if (!mappingStr) {
+              if (!process.env.AUTHOR_REVIEWER_MAPPING) {
                 throw new Error('AUTHOR_REVIEWER_MAPPING 시크릿이 설정되지 않았습니다.');
               }
-              authorReviewerMapping = JSON.parse(mappingStr);
+              authorReviewerMapping = JSON.parse(process.env.AUTHOR_REVIEWER_MAPPING);
               if (typeof authorReviewerMapping !== 'object' || authorReviewerMapping === null) {
                 throw new Error('AUTHOR_REVIEWER_MAPPING이 올바른 JSON 객체가 아닙니다.');
               }

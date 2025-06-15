@@ -21,13 +21,13 @@ jobs:
             const pr = context.payload.pull_request;
             
             // Get GitHub to Discord ID mapping from secrets
-            let idMapping;
+            let idMapping = {};
+            
             try {
-              const mappingStr = process.env.USERNAME_DISCORD_MAPPING;
-              if (!mappingStr) {
+              if (!process.env.USERNAME_DISCORD_MAPPING) {
                 throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
               }
-              idMapping = JSON.parse(mappingStr);
+              idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
               if (typeof idMapping !== 'object' || idMapping === null) {
                 throw new Error('USERNAME_DISCORD_MAPPING이 올바른 JSON 객체가 아닙니다.');
               }
