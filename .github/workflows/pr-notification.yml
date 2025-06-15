@@ -88,8 +88,9 @@ jobs:
             // Get GitHub to Discord ID mapping from secrets
             let idMapping;
             try {
-              const mappingStr = ${{ secrets.USERNAME_DISCORD_MAPPING }}
+              const mappingStr = process.env.USERNAME_DISCORD_MAPPING;
               if (!mappingStr) {
+
                 throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
               }
               idMapping = JSON.parse(mappingStr);
@@ -103,7 +104,6 @@ jobs:
             
             let authorReviewerMapping;
             try {
-              const mappingStr = ${{ secrets.AUTHOR_REVIEWER_MAPPING }}
               if (!mappingStr) {
                 throw new Error('AUTHOR_REVIEWER_MAPPING 시크릿이 설정되지 않았습니다.');
               }
