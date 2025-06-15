@@ -22,14 +22,32 @@ jobs:
             
             // Get GitHub to Discord ID mapping from secrets
             let idMapping = {};
+            let authorReviewerMapping = {};
             
+            console.log('USERNAME_DISCORD_MAPPING:', '${{ secrets.USERNAME_DISCORD_MAPPING }}');
             try {
-              if (!process.env.USERNAME_DISCORD_MAPPING) {
+              const mappingStr = '${{ secrets.USERNAME_DISCORD_MAPPING }}';
+              if (!mappingStr || mappingStr === '${{ secrets.USERNAME_DISCORD_MAPPING }}') {
                 throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
               }
-              idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
+              idMapping = JSON.parse(mappingStr);
               if (typeof idMapping !== 'object' || idMapping === null) {
                 throw new Error('USERNAME_DISCORD_MAPPING이 올바른 JSON 객체가 아닙니다.');
+              }
+            } catch (error) {
+              console.error('시크릿 파싱 에러:', error.message);
+              throw new Error(`시크릿 파싱 에러: ${error.message}`);
+            }
+            
+            console.log('AUTHOR_REVIEWER_MAPPING:', '${{ secrets.AUTHOR_REVIEWER_MAPPING }}');
+            try {
+              const mappingStr = '${{ secrets.AUTHOR_REVIEWER_MAPPING }}';
+              if (!mappingStr || mappingStr === '${{ secrets.AUTHOR_REVIEWER_MAPPING }}') {
+                throw new Error('AUTHOR_REVIEWER_MAPPING 시크릿이 설정되지 않았습니다.');
+              }
+              authorReviewerMapping = JSON.parse(mappingStr);
+              if (typeof authorReviewerMapping !== 'object' || authorReviewerMapping === null) {
+                throw new Error('AUTHOR_REVIEWER_MAPPING이 올바른 JSON 객체가 아닙니다.');
               }
             } catch (error) {
               console.error('시크릿 파싱 에러:', error.message);
@@ -80,4 +98,5 @@ jobs:
             });
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }} 
+          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }}
+          AUTHOR_REVIEWER_MAPPING: ${{ secrets.AUTHOR_REVIEWER_MAPPING }} 
