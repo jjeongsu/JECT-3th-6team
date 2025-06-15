@@ -17,34 +17,60 @@ jobs:
         with:
           script: |
             const pr = context.payload.pull_request;
-            const project = await github.rest.projects.listForRepo({
+            
+            // Get project information using GraphQL API
+            const query = `
+              query($owner: String!, $repo: String!, $prNumber: Int!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequest(number: $prNumber) {
+                    projectItems(first: 1) {
+                      nodes {
+                        project {
+                          title
+                        }
+                        fieldValues(first: 10) {
+                          nodes {
+                            ... on ProjectV2ItemFieldDateValue {
+                              date
+                              field {
+                                ... on ProjectV2Field {
+                                  name
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            `;
+            
+            const variables = {
               owner: context.repo.owner,
               repo: context.repo.repo,
-            });
+              prNumber: pr.number
+            };
             
-            // Get project fields for the PR
-            const projectItems = await github.rest.projects.listProjectItems({
-              project_id: project.data[0].id,
-            });
+            const response = await github.graphql(query, variables);
+            const projectItem = response.repository.pullRequest.projectItems.nodes[0];
             
-            const prItem = projectItems.data.find(item => 
-              item.content_url === pr.html_url
-            );
-            
-            if (!prItem) {
+            if (!projectItem) {
               return {
                 review_due_date: 'Not set',
                 merge_due_date: 'Not set'
               };
             }
             
-            const fields = await github.rest.projects.listProjectItemFields({
-              project_id: project.data[0].id,
-              item_id: prItem.id,
-            });
+            const fields = projectItem.fieldValues.nodes;
+            const reviewDueDate = fields.find(field => 
+              field?.field?.name === '리뷰 마감일'
+            )?.date || 'Not set';
             
-            const reviewDueDate = fields.data.find(field => field.name === '리뷰 마감일')?.value || 'Not set';
-            const mergeDueDate = fields.data.find(field => field.name === '머지 예정일')?.value || 'Not set';
+            const mergeDueDate = fields.find(field => 
+              field?.field?.name === '머지 예정일'
+            )?.date || 'Not set';
             
             return {
               review_due_date: reviewDueDate,
