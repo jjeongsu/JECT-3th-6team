@@ -19,7 +19,20 @@ jobs:
             const pr = context.payload.pull_request;
             
             // Get GitHub to Discord ID mapping from secrets
-            const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
+            let idMapping;
+            try {
+              const mappingStr = process.env.USERNAME_DISCORD_MAPPING;
+              if (!mappingStr) {
+                throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
+              }
+              idMapping = JSON.parse(mappingStr);
+              if (typeof idMapping !== 'object' || idMapping === null) {
+                throw new Error('USERNAME_DISCORD_MAPPING이 올바른 JSON 객체가 아닙니다.');
+              }
+            } catch (error) {
+              console.error('시크릿 파싱 에러:', error.message);
+              throw new Error(`시크릿 파싱 에러: ${error.message}`);
+            }
             
             // Get Discord IDs
             const assigneeDiscordId = idMapping[pr.assignee?.login] || pr.assignee?.login;

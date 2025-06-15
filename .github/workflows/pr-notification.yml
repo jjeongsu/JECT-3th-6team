@@ -86,8 +86,35 @@ jobs:
             const reviewers = pr.requested_reviewers.map(r => r.login);
             
             // Get GitHub to Discord ID mapping from secrets
-            const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
-            const authorReviewerMapping = JSON.parse(process.env.AUTHOR_REVIEWER_MAPPING);
+            let idMapping;
+            try {
+              const mappingStr = process.env.USERNAME_DISCORD_MAPPING;
+              if (!mappingStr) {
+                throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
+              }
+              idMapping = JSON.parse(mappingStr);
+              if (typeof idMapping !== 'object' || idMapping === null) {
+                throw new Error('USERNAME_DISCORD_MAPPING이 올바른 JSON 객체가 아닙니다.');
+              }
+            } catch (error) {
+              console.error('시크릿 파싱 에러:', error.message);
+              throw new Error(`시크릿 파싱 에러: ${error.message}`);
+            }
+            
+            let authorReviewerMapping;
+            try {
+              const mappingStr = process.env.AUTHOR_REVIEWER_MAPPING;
+              if (!mappingStr) {
+                throw new Error('AUTHOR_REVIEWER_MAPPING 시크릿이 설정되지 않았습니다.');
+              }
+              authorReviewerMapping = JSON.parse(mappingStr);
+              if (typeof authorReviewerMapping !== 'object' || authorReviewerMapping === null) {
+                throw new Error('AUTHOR_REVIEWER_MAPPING이 올바른 JSON 객체가 아닙니다.');
+              }
+            } catch (error) {
+              console.error('시크릿 파싱 에러:', error.message);
+              throw new Error(`시크릿 파싱 에러: ${error.message}`);
+            }
             
             // Set PR author as assignee
             await github.rest.issues.addAssignees({
