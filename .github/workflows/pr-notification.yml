@@ -86,7 +86,7 @@ jobs:
                 fields: [
                   {
                     name: 'Review Request',
-                    value: `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`
+                    value: reviewRequestValue
                   },
                   {
                     name: 'Review Due Date',
