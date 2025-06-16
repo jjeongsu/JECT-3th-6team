@@ -23,7 +23,7 @@ jobs:
         run: |
           # PR 작성자의 Discord ID 설정
           echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
-          echo "REVIEWER_DISCORD_ID=${{ env[github.event.pull_request.requested_reviewers.*.login] }}" >> $GITHUB_ENV
+          echo "REVIEWER_DISCORD_ID=${{ join(env[github.event.pull_request.requested_reviewers.*.login]) }}" >> $GITHUB_ENV
           echo "${{env.REVIEWER_DISCORD_ID}}"
 
       - name: Get PR information
