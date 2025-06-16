@@ -23,7 +23,6 @@ jobs:
           # PR 작성자의 Discord ID 설정
           echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
           echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
-          echo "PR_BODY=${{ github.event.pull_request.body }}" >> $GITHUB_ENV
 
           # PR 본문을 쉘 변수로 가져옵니다.
           PR_BODY="${{ github.event.pull_request.body }}"
