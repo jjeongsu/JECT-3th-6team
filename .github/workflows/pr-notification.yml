@@ -90,11 +90,11 @@ jobs:
                   },
                   {
                     name: 'Review Due Date',
-                    value: '${{ env.REVIEW_DEADLINE }}'
+                    value: ' '
                   },
                   {
                     name: 'Merge Due Date',
-                    value: '${{ env.MERGE_SCHEDULE_DATE }}'
+                    value: ' '
                   }
                 ]
               }]
