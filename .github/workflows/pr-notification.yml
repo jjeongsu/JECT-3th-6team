@@ -20,8 +20,18 @@ jobs:
       - name: Get Assignees
         id: assignees
         run: |
-          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
-          echo "REVIEWER_DISCORD_ID=${{ env[github.event.pull_request.requested_reviewers[0].login] }}" >> $GITHUB_ENV
+          # PR 작성자의 Discord ID 설정
+          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.user.login] }}" >> $GITHUB_ENV
+          
+          # 모든 리뷰어의 Discord ID를 쉼표로 구분하여 설정
+          REVIEWERS=""
+          for reviewer in ${{ join(github.event.pull_request.requested_reviewers.*.login, ' ') }}; do
+            if [ -n "$REVIEWERS" ]; then
+              REVIEWERS="$REVIEWERS,"
+            fi
+            REVIEWERS="$REVIEWERS${{ env[reviewer] }}"
+          done
+          echo "REVIEWER_DISCORD_IDS=$REVIEWERS" >> $GITHUB_ENV
 
       - name: Get PR information
         id: pr_info
@@ -93,9 +103,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            // 모든 리뷰어 멘션 생성
+            const reviewerIds = process.env.REVIEWER_DISCORD_IDS ? 
+              process.env.REVIEWER_DISCORD_IDS.split(',').map(id => `<@${id}>`).join(', ') : 
+              '리뷰어가 지정되지 않았습니다.';
             
-            const reviewerMentions = `<@${{env.REVIEWER_DISCORD_ID}}>`;
-            const authorMention = `<@${{env.ASSIGNEE_DISCORD_ID}}>`;
+            const authorMention = `<@${process.env.ASSIGNEE_DISCORD_ID}>`;
             
             const message = {
               embeds: [{
@@ -105,7 +118,7 @@ jobs:
                 fields: [
                   {
                     name: 'Review Request',
-                    value: `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`
+                    value: `${reviewerIds}님 ${authorMention}의 리뷰 요청이 있습니다.`
                   },
                   {
                     name: 'Review Due Date',
