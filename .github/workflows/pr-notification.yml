@@ -21,7 +21,7 @@ jobs:
         id: assignees
         run: |
           echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
-          echo "REVIEWER_DISCORD_ID=${{ env[github.event.pull_request.requested_reviewer.login] }}" >> $GITHUB_ENV
+          echo "REVIEWER_DISCORD_ID=${{ env[github.event.pull_request.requested_reviewers[0].login] }}" >> $GITHUB_ENV
 
       - name: Get PR information
         id: pr_info
