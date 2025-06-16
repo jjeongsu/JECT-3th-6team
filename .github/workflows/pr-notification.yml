@@ -9,6 +9,7 @@ env:
   kimhyunjee: ${{secrets.KIMHYUNJEE_DISCORD_ID}}
   robinjoon: ${{secrets.ROBINJON_DISCORD_ID}}
   sangxxjin: ${{secrets.SANGXXJIN_DISCORD_ID}}
+  
 
 jobs:
   notify-discord:
