@@ -98,10 +98,10 @@ jobs:
           script: |
             // 환경 변수에 정의된 Discord ID 매핑 객체 생성
             const discordIdMap = {
-              jjeongsu: ${{env.JJEONGSU_DISCORD_ID}},
-              kimhyunjee: ${{env.KIMHYUNJEE_DISCORD_ID}},
-              robinjoon: ${{env.ROBINJOON_DISCORD_ID}},
-              sangxxjin: ${{env.SANGXXJIN_DISCORD_ID}},
+              jjeongsu: ${{env.jjeongsu}},
+              kimhyunjee: ${{env.kimhyunjee}},
+              robinjoon: ${{env.robinjoon}},
+              sangxxjin: ${{env.sangxxjin}},
               // 필요하다면 다른 팀원들의 ID도 여기에 추가
             };
 
