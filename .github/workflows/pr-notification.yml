@@ -24,73 +24,42 @@ jobs:
           # PR 작성자의 Discord ID 설정
           echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
           echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
-          echo "${{env.REVIEWERS}}"
+          echo "PR_BODY=${{ github.event.pull_request.body }}" >> $GITHUB_ENV
 
       - name: Get PR information
         id: pr_info
         uses: actions/github-script@v7
         with:
           script: |
-            const pr = context.payload.pull_request;
-            
-            // Get project information using GraphQL API
-            const query = `
-              query($owner: String!, $repo: String!, $prNumber: Int!) {
-                repository(owner: $owner, name: $repo) {
-                  pullRequest(number: $prNumber) {
-                    projectItems(first: 1) {
-                      nodes {
-                        project {
-                          title
-                        }
-                        fieldValues(first: 10) {
-                          nodes {
-                            ... on ProjectV2ItemFieldDateValue {
-                              date
-                              field {
-                                ... on ProjectV2Field {
-                                  name
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
+            const pr_body = "${{ env.PR_BODY }}";
+            const reviewDueDateKey = "- 리뷰 요청 기한:";
+            const mergeDueDateKey = "- 머지 예정일:";
+            let reviewDueDate = "Not set";
+            let mergeDueDate = "Not set";
+            const reviewDueDateStartIndex = prBodyContent.indexOf(reviewDueDateKey);
+            if (reviewDueDateStartIndex !== -1) {
+                // "리뷰 요청 기한:" 다음부터 줄바꿈 또는 다음 키워드까지 추출
+                const substringAfterReviewKey = prBodyContent.substring(reviewDueDateStartIndex + reviewDueDateKey.length).trimStart();
+                // 날짜 형식 (YYYY-MM-DD)을 찾는 정규식
+                const dateMatch = substringAfterReviewKey.match(/^\s*(\d{4}-\d{2}-\d{2})/);
+                if (dateMatch && dateMatch[1]) {
+                    reviewDueDate = dateMatch[1];
                 }
-              }
-            `;
-            
-            const variables = {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              prNumber: pr.number
-            };
-            
-            const response = await github.graphql(query, variables);
-            const projectItem = response.repository.pullRequest.projectItems.nodes[0];
-            
-            if (!projectItem) {
-              return {
-                review_due_date: 'Not set',
-                merge_due_date: 'Not set'
-              };
             }
-            
-            const fields = projectItem.fieldValues.nodes;
-            const reviewDueDate = fields.find(field => 
-              field?.field?.name === '리뷰 마감일'
-            )?.date || 'Not set';
-            
-            const mergeDueDate = fields.find(field => 
-              field?.field?.name === '머지 예정일'
-            )?.date || 'Not set';
-            
-            return {
-              review_due_date: reviewDueDate,
-              merge_due_date: mergeDueDate
-            };
+
+            const mergeDueDateStartIndex = prBodyContent.indexOf(mergeDueDateKey);
+            if (mergeDueDateStartIndex !== -1) {
+                // "머지 예정일:" 다음부터 줄바꿈 또는 다음 키워드까지 추출
+                const substringAfterMergeKey = prBodyContent.substring(mergeDueDateStartIndex + mergeDueDateKey.length).trimStart();
+                // 날짜 형식 (YYYY-MM-DD)을 찾는 정규식
+                const dateMatch = substringAfterMergeKey.match(/^\s*(\d{4}-\d{2}-\d{2})/);
+                if (dateMatch && dateMatch[1]) {
+                    mergeDueDate = dateMatch[1];
+                }
+            }
+
+            return reviewDueDate + "," + mergeDueDate;
+        result-encoding: string
 
       - name: Send Discord notification
         uses: actions/github-script@v7
@@ -129,6 +98,10 @@ jobs:
                 reviewRequestValue = `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`;
             }
             
+            const dates = "${{ steps.pr_info.outputs.result }}";
+            const reviewDueDate = dates.split(",")[0];
+            const mergeDueDate = dates.split(",")[1];
+
             const message = {
               embeds: [{
                 title: "${{ github.event.pull_request.title }}",
@@ -141,11 +114,11 @@ jobs:
                   },
                   {
                     name: 'Review Due Date',
-                    value: '${{ steps.pr_info.outputs.review_due_date }}'
+                    value: reviewDueDate
                   },
                   {
                     name: 'Merge Due Date',
-                    value: '${{ steps.pr_info.outputs.merge_due_date }}'
+                    value: mergeDueDate
                   }
                 ]
               }]
