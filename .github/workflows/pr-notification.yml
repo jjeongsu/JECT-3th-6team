@@ -105,8 +105,8 @@ jobs:
             };
 
             // 모든 요청된 리뷰어 멘션 생성
-            const requestedReviewers = ${{env.REVIEWER_DISCORD_ID}};
-
+            const requestedReviewers = pr.requested_reviewers;
+            
             let reviewerMentions = '';
             if (requestedReviewers && requestedReviewers.length > 0) {
               reviewerMentions = requestedReviewers.map(reviewer => {
