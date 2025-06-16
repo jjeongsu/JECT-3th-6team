@@ -9,7 +9,7 @@ env:
   kimhyunjee: ${{secrets.KIMHYUNJEE_DISCORD_ID}}
   robinjoon: ${{secrets.ROBINJON_DISCORD_ID}}
   sangxxjin: ${{secrets.SANGXXJIN_DISCORD_ID}}
-  
+
 
 jobs:
   notify-discord:
@@ -22,17 +22,8 @@ jobs:
         id: assignees
         run: |
           # PR 작성자의 Discord ID 설정
-          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.user.login] }}" >> $GITHUB_ENV
-          
-          # 모든 리뷰어의 Discord ID를 쉼표로 구분하여 설정
-          REVIEWERS=""
-          for reviewer in ${{ join(github.event.pull_request.requested_reviewers.*.login, ' ') }}; do
-            if [ -n "$REVIEWERS" ]; then
-              REVIEWERS="$REVIEWERS,"
-            fi
-            REVIEWERS="$REVIEWERS${{ env[reviewer] }}"
-          done
-          echo "REVIEWER_DISCORD_IDS=$REVIEWERS" >> $GITHUB_ENV
+          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
+          echo "REVIEWER_DISCORD_ID=${{ env[github.event.pull_request.requested_reviewers.*.login] }}" >> $GITHUB_ENV
 
       - name: Get PR information
         id: pr_info
@@ -104,12 +95,35 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // 모든 리뷰어 멘션 생성
-            const reviewerIds = process.env.REVIEWER_DISCORD_IDS ? 
-              process.env.REVIEWER_DISCORD_IDS.split(',').map(id => `<@${id}>`).join(', ') : 
-              '리뷰어가 지정되지 않았습니다.';
-            
-            const authorMention = `<@${process.env.ASSIGNEE_DISCORD_ID}>`;
+            // 환경 변수에 정의된 Discord ID 매핑 객체 생성
+            const discordIdMap = {
+              jjeongsu: process.env.JJEONGSU_DISCORD_ID,
+              kimhyunjee: process.env.KIMHYUNJEE_DISCORD_ID,
+              robinjoon: process.env.ROBINJOON_DISCORD_ID,
+              sangxxjin: process.env.SANGXXJIN_DISCORD_ID,
+              // 필요하다면 다른 팀원들의 ID도 여기에 추가
+            };
+
+            // 모든 요청된 리뷰어 멘션 생성
+            let reviewerMentions = '';
+            if (requestedReviewers && requestedReviewers.length > 0) {
+              reviewerMentions = requestedReviewers.map(reviewer => {
+                const discordId = discordIdMap[reviewer.login.toLowerCase()]; // GitHub 로그인 이름을 소문자로 변환하여 매핑
+                return discordId ? `<@${discordId}>` : `**@${reviewer.login}** (Discord ID not found)`;
+              }).join(', ');
+            } else {
+              reviewerMentions = '리뷰어 없음';
+            }
+
+            const authorMention = `<@${{env.ASSIGNEE_DISCORD_ID}}>`;
+
+            // 리뷰 요청 메시지 구성
+            let reviewRequestValue = '';
+            if (reviewerMentions === '리뷰어 없음') {
+                reviewRequestValue = `${authorMention}님의 새로운 PR이 등록되었습니다.`;
+            } else {
+                reviewRequestValue = `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`;
+            }
             
             const message = {
               embeds: [{
@@ -119,7 +133,7 @@ jobs:
                 fields: [
                   {
                     name: 'Review Request',
-                    value: `${reviewerIds}님 ${authorMention}의 리뷰 요청이 있습니다.`
+                    value: `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`
                   },
                   {
                     name: 'Review Due Date',
