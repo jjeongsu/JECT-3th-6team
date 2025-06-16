@@ -4,12 +4,24 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
+env:
+  jjeongsu: ${{secrets.JJEONGSU_DISCORD_ID}}
+  kimhyunjee: ${{secrets.KIMHYUNJEE_DISCORD_ID}}
+  robinjoon: ${{secrets.ROBINJON_DISCORD_ID}}
+  sangxxjin: ${{secrets.SANGXXJIN_DISCORD_ID}}
+
 jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Get Assignees
+        id: assignees
+        run: |
+          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
+          echo "REVIEWER_DISCORD_ID=${{ env[github.event.pull_request.requested_reviewer.login] }}" >> $GITHUB_ENV
 
       - name: Get PR information
         id: pr_info
@@ -81,90 +93,9 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const pr = context.payload.pull_request;
-            const author = pr.user.login;
-            const reviewers = pr.requested_reviewers.map(r => r.login);
             
-            // Get GitHub to Discord ID mapping from secrets
-            let idMapping = {};
-            let authorReviewerMapping = {};
-            
-            console.log('USERNAME_DISCORD_MAPPING:', process.env.USERNAME_DISCORD_MAPPING);
-            try {
-              if (!process.env.USERNAME_DISCORD_MAPPING) {
-                throw new Error('USERNAME_DISCORD_MAPPING 시크릿이 설정되지 않았습니다.');
-              }
-              // 쉼표로 구분된 매핑 문자열을 파싱
-              const mappings = process.env.USERNAME_DISCORD_MAPPING.split(',');
-              for (const mapping of mappings) {
-                const [githubUsername, discordId] = mapping.split(':').map(s => s.trim());
-                if (githubUsername && discordId) {
-                  idMapping[githubUsername] = discordId;
-                }
-              }
-              if (Object.keys(idMapping).length === 0) {
-                throw new Error('USERNAME_DISCORD_MAPPING이 올바른 형식이 아닙니다.');
-              }
-            } catch (error) {
-              console.error('시크릿 파싱 에러:', error.message);
-              throw new Error(`시크릿 파싱 에러: ${error.message}`);
-            }
-            
-            console.log('AUTHOR_REVIEWER_MAPPING:', process.env.AUTHOR_REVIEWER_MAPPING);
-            try {
-              if (!process.env.AUTHOR_REVIEWER_MAPPING) {
-                throw new Error('AUTHOR_REVIEWER_MAPPING 시크릿이 설정되지 않았습니다.');
-              }
-              // 쉼표로 구분된 매핑 문자열을 파싱
-              const mappings = process.env.AUTHOR_REVIEWER_MAPPING.split(',');
-              for (const mapping of mappings) {
-                const [author, reviewer] = mapping.split(':').map(s => s.trim());
-                if (author && reviewer) {
-                  authorReviewerMapping[author] = reviewer;
-                }
-              }
-              if (Object.keys(authorReviewerMapping).length === 0) {
-                throw new Error('AUTHOR_REVIEWER_MAPPING이 올바른 형식이 아닙니다.');
-              }
-            } catch (error) {
-              console.error('시크릿 파싱 에러:', error.message);
-              throw new Error(`시크릿 파싱 에러: ${error.message}`);
-            }
-            
-            // Set PR author as assignee
-            await github.rest.issues.addAssignees({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.number,
-              assignees: [author]
-            });
-            
-            // Get Discord IDs
-            const authorDiscordId = idMapping[author] || author;
-            let reviewerDiscordIds;
-            
-            if (reviewers.length > 0) {
-              // 명시적으로 지정된 리뷰어가 있는 경우
-              reviewerDiscordIds = reviewers.map(r => idMapping[r] || r);
-            } else {
-              // 리뷰어가 지정되지 않은 경우, 작성자별 기본 리뷰어 사용
-              const defaultReviewer = authorReviewerMapping[author];
-              if (!defaultReviewer) {
-                throw new Error(`${author}님의 기본 리뷰어가 설정되지 않았습니다.`);
-              }
-              reviewerDiscordIds = [idMapping[defaultReviewer] || defaultReviewer];
-              
-              // 기본 리뷰어를 PR에 자동으로 지정
-              await github.rest.pulls.requestReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                reviewers: [defaultReviewer]
-              });
-            }
-            
-            const reviewerMentions = reviewerDiscordIds.map(id => `<@${id}>`).join(', ');
-            const authorMention = `<@${authorDiscordId}>`;
+            const reviewerMentions = `<@${{env.REVIEWER_DISCORD_ID}}>`;
+            const authorMention = `<@${{env.ASSIGNEE_DISCORD_ID}}>`;
             
             const message = {
               embeds: [{
@@ -197,5 +128,3 @@ jobs:
             });
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }}
-          AUTHOR_REVIEWER_MAPPING: ${{ secrets.AUTHOR_REVIEWER_MAPPING }} 
