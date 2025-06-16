@@ -112,7 +112,7 @@ jobs:
             let reviewerMentions = '';
             if (requestedReviewersArray && requestedReviewersArray.length > 0) {
               reviewerMentions = requestedReviewersArray.map(reviewer => {
-                const discordId = discordIdMap[reviewer.login.toLowerCase()]; // GitHub 로그인 이름을 소문자로 변환하여 매핑
+                const discordId = discordIdMap[reviewer]; // GitHub 로그인 이름을 소문자로 변환하여 매핑
                 return discordId ? `<@${discordId}>` : `**@${reviewer.login}** (Discord ID not found)`;
               }).join(', ');
             } else {
