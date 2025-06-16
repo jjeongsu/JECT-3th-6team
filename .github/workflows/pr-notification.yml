@@ -25,6 +25,23 @@ jobs:
           echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
           echo "PR_BODY=${{ github.event.pull_request.body }}" >> $GITHUB_ENV
 
+          # PR 본문을 쉘 변수로 가져옵니다.
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # "리뷰 요청 기한:" 라인을 찾아 콜론(:)을 기준으로 두 번째 필드를 가져오고, 앞뒤 공백을 제거합니다.
+          REVIEW_DEADLINE=$(echo "$PR_BODY" | grep "리뷰 요청 기한:" | cut -d ':' -f 2 | xargs)
+          
+          # "머지 예정일:" 라인을 찾아 동일한 작업을 수행합니다.
+          MERGE_DATE=$(echo "$PR_BODY" | grep "머지 예정일:" | cut -d ':' -f 2 | xargs)
+
+          # 후속 스텝에서 사용할 수 있도록 환경 변수로 설정합니다.
+          # 이 방법은 동일한 Job 내의 다음 스텝들에게 환경 변수를 전달하는 표준 방식입니다.
+          echo "REVIEW_DEADLINE=${REVIEW_DEADLINE}" >> $GITHUB_ENV
+          echo "MERGE_SCHEDULE_DATE=${MERGE_DATE}" >> $GITHUB_ENV
+          
+          echo "파싱된 리뷰 기한: ${REVIEW_DEADLINE}"
+          echo "파싱된 머지 예정일: ${MERGE_DATE}"
+
       - name: Get PR information
         id: pr_info
         uses: actions/github-script@v7
@@ -96,10 +113,6 @@ jobs:
             } else {
                 reviewRequestValue = `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`;
             }
-            
-            const dates = "${{ steps.pr_info.outputs.result }}";
-            const reviewDueDate = dates.split(",")[0];
-            const mergeDueDate = dates.split(",")[1];
 
             const message = {
               embeds: [{
@@ -113,11 +126,11 @@ jobs:
                   },
                   {
                     name: 'Review Due Date',
-                    value: reviewDueDate
+                    value: '${{ env.REVIEW_DEADLINE }}'
                   },
                   {
                     name: 'Merge Due Date',
-                    value: mergeDueDate
+                    value: '${{ env.MERGE_SCHEDULE_DATE }}'
                   }
                 ]
               }]
