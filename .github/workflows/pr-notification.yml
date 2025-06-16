@@ -23,8 +23,8 @@ jobs:
         run: |
           # PR 작성자의 Discord ID 설정
           echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
-          echo "REVIEWER_DISCORD_ID=${{ join(env[github.event.pull_request.requested_reviewers.login]) }}" >> $GITHUB_ENV
-          echo "${{env.REVIEWER_DISCORD_ID}}"
+          echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
+          echo "${{env.REVIEWERS}}"
 
       - name: Get PR information
         id: pr_info
@@ -98,19 +98,20 @@ jobs:
           script: |
             // 환경 변수에 정의된 Discord ID 매핑 객체 생성
             const discordIdMap = {
-              jjeongsu: process.env.JJEONGSU_DISCORD_ID,
-              kimhyunjee: process.env.KIMHYUNJEE_DISCORD_ID,
-              robinjoon: process.env.ROBINJOON_DISCORD_ID,
-              sangxxjin: process.env.SANGXXJIN_DISCORD_ID,
+              jjeongsu: ${{env.JJEONGSU_DISCORD_ID}},
+              kimhyunjee: ${{env.KIMHYUNJEE_DISCORD_ID}},
+              robinjoon: ${{env.ROBINJOON_DISCORD_ID}},
+              sangxxjin: ${{env.SANGXXJIN_DISCORD_ID}},
               // 필요하다면 다른 팀원들의 ID도 여기에 추가
             };
 
             // 모든 요청된 리뷰어 멘션 생성
-            const requestedReviewers = pr.requested_reviewers;
+            const requestedReviewers = "${{ env.REVIEWERS }}";
+            const requestedReviewersArray = requestedReviewers.split(',');
             
             let reviewerMentions = '';
-            if (requestedReviewers && requestedReviewers.length > 0) {
-              reviewerMentions = requestedReviewers.map(reviewer => {
+            if (requestedReviewersArray && requestedReviewersArray.length > 0) {
+              reviewerMentions = requestedReviewersArray.map(reviewer => {
                 const discordId = discordIdMap[reviewer.login.toLowerCase()]; // GitHub 로그인 이름을 소문자로 변환하여 매핑
                 return discordId ? `<@${discordId}>` : `**@${reviewer.login}** (Discord ID not found)`;
               }).join(', ');
