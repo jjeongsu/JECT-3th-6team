@@ -5,7 +5,7 @@ on:
     types: [opened, edited, reopened]
 
 jobs:
-  notify-discord:
+  issue-schedule:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -15,11 +15,11 @@ jobs:
         id: dump_context
         run: echo '${{ toJSON(github.event) }}'
       
-      - name: Get Assignees
+      - name: Get Schedule
         id: assignees
         run: |
           # 이슈 본문을 쉘 변수로 가져옵니다.
-          ISSUE_BODY="${{ github.event.issues.body }}"
+          ISSUE_BODY="${{ github.event.issue.body }}"
 
           # "시작일:" 라인을 찾아 콜론(:)을 기준으로 두 번째 필드를 가져오고, 앞뒤 공백을 제거합니다.
           START_DATE=$(echo "$ISSUE_BODY" | grep "시작일:" | sed 's/.*시작일:\s*//' | tr -d '\n\r' | xargs)
