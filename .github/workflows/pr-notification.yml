@@ -62,7 +62,7 @@ jobs:
             if (requestedReviewersArray && requestedReviewersArray.length > 0) {
               reviewerMentions = requestedReviewersArray.map(reviewer => {
                 const discordId = discordIdMap[reviewer];
-                return discordId ? `<@${discordId}>` : `**@${reviewer}** (Discord ID not found)`;
+                return discordId ? `<@${discordId}>` : '';
               }).join(', ');
             } else {
               reviewerMentions = '리뷰어 없음';
