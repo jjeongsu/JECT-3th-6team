@@ -62,8 +62,8 @@ jobs:
             if (requestedReviewersArray && requestedReviewersArray.length > 0) {
               reviewerMentions = requestedReviewersArray.map(reviewer => {
                 const discordId = discordIdMap[reviewer];
-                return discordId ? `<@${discordId}>` : '';
-              }).join(', ');
+                return discordId;
+              }).filter(id => id != null).map(id => `<@${id}>`).join(', ');
             } else {
               reviewerMentions = '리뷰어 없음';
             }
@@ -72,7 +72,7 @@ jobs:
 
             // 리뷰 요청 메시지 구성
             let reviewRequestValue = '';
-            if (reviewerMentions === '리뷰어 없음') {
+            if (reviewerMentions === '리뷰어 없음' || reviewerMentions === '') {
                 reviewRequestValue = `${authorMention}님의 새로운 PR이 등록되었습니다.`;
             } else {
                 reviewRequestValue = `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`;
