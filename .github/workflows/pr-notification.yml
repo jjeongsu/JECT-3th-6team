@@ -55,7 +55,7 @@ jobs:
           project-url: https://github.com/orgs/JECT-Study/projects/18
           github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
           field-name: "리뷰 마감일"
-          field-value: "${REVIEW_DEADLINE}"
+          field-value: "${{ env.REVIEW_DEADLINE }}"
 
       - name: Update merge schedule date
         uses: nipe0324/update-project-v2-item-field@v2.0.2
@@ -63,7 +63,7 @@ jobs:
           project-url: https://github.com/orgs/JECT-Study/projects/18
           github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
           field-name: "작업 완료/머지 예정일"
-          field-value: "${MERGE_SCHEDULE_DATE}"
+          field-value: "${{ env.MERGE_SCHEDULE_DATE }}"
 
       - name: Send Discord notification
         uses: actions/github-script@v7
