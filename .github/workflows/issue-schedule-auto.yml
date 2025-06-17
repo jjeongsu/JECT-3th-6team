@@ -1,0 +1,56 @@
+name: PR Notification
+
+on:
+  issue:
+    types: [opened, edited, reopened]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Get Assignees
+        id: assignees
+        run: |
+          # 이슈 본문을 쉘 변수로 가져옵니다.
+          ISSUE_BODY="${{ github.event.issue.body }}"
+
+          # "시작일:" 라인을 찾아 콜론(:)을 기준으로 두 번째 필드를 가져오고, 앞뒤 공백을 제거합니다.
+          START_DATE=$(echo "$ISSUE_BODY" | grep "시작일:" | sed 's/.*시작일:\s*//' | tr -d '\n\r' | xargs)
+          
+          # "완료일:" 라인을 찾아 동일한 작업을 수행합니다.
+          END_DATE=$(echo "$ISSUE_BODY" | grep "완료일:" | sed 's/.*완료일:\s*//' | tr -d '\n\r' | xargs)
+
+          # 후속 스텝에서 사용할 수 있도록 환경 변수로 설정합니다.
+          # 이 방법은 동일한 Job 내의 다음 스텝들에게 환경 변수를 전달하는 표준 방식입니다.
+          echo "START_DATE=${START_DATE}" >> $GITHUB_ENV
+          echo "END_DATE=${END_DATE}" >> $GITHUB_ENV
+          
+          echo "파싱된 시작일: ${START_DATE}"
+          echo "파싱된 완료일: ${END_DATE}"
+      
+      - name: Update status to "시작 전"
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "Status"
+          field-value: "시작 전"
+
+      - name: Update start date
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "작업 생성일"
+          field-value: "${{ env.START_DATE }}"
+
+      - name: Update end date
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "작업 완료/머지 예정일"
+          field-value: "${{ env.END_DATE }}"
