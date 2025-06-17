@@ -1,7 +1,7 @@
-name: PR Notification
+name: Issue Schedule
 
 on:
-  issue:
+  issues:
     types: [opened, edited, reopened]
 
 jobs:
