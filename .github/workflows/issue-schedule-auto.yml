@@ -15,7 +15,7 @@ jobs:
         id: assignees
         run: |
           # 이슈 본문을 쉘 변수로 가져옵니다.
-          ISSUE_BODY="${{ github.event.issue.body }}"
+          ISSUE_BODY="${{ github.event.issues.body }}"
 
           # "시작일:" 라인을 찾아 콜론(:)을 기준으로 두 번째 필드를 가져오고, 앞뒤 공백을 제거합니다.
           START_DATE=$(echo "$ISSUE_BODY" | grep "시작일:" | sed 's/.*시작일:\s*//' | tr -d '\n\r' | xargs)
