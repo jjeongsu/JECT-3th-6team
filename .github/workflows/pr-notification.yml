@@ -2,7 +2,13 @@ name: PR Notification
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
+
+env:
+  jjeongsu: ${{secrets.JJEONGSU_DISCORD_ID}}
+  kimhyunjee: ${{secrets.KIMHYUNJEE_DISCORD_ID}}
+  robinjoon: ${{secrets.ROBINJON_DISCORD_ID}}
+  sangxxjin: ${{secrets.SANGXXJIN_DISCORD_ID}}
 
 jobs:
   notify-discord:
@@ -10,137 +16,111 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Get Assignees
+        id: assignees
+        run: |
+          # PR 작성자의 Discord ID 설정
+          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
+          echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
 
-      - name: Get PR information
-        id: pr_info
-        uses: actions/github-script@v7
+          # PR 본문을 쉘 변수로 가져옵니다.
+          PR_BODY="${{ github.event.pull_request.body }}"
+
+          # "리뷰 요청 기한:" 라인을 찾아 콜론(:)을 기준으로 두 번째 필드를 가져오고, 앞뒤 공백을 제거합니다.
+          REVIEW_DEADLINE=$(echo "$PR_BODY" | grep "리뷰 요청 기한:" | sed 's/.*리뷰 요청 기한:\s*//' | tr -d '\n\r' | xargs)
+          
+          # "머지 예정일:" 라인을 찾아 동일한 작업을 수행합니다.
+          MERGE_DATE=$(echo "$PR_BODY" | grep "머지 예정일:" | sed 's/.*머지 예정일:\s*//' | tr -d '\n\r' | xargs)
+
+          # 후속 스텝에서 사용할 수 있도록 환경 변수로 설정합니다.
+          # 이 방법은 동일한 Job 내의 다음 스텝들에게 환경 변수를 전달하는 표준 방식입니다.
+          echo "REVIEW_DEADLINE=${REVIEW_DEADLINE}" >> $GITHUB_ENV
+          echo "MERGE_SCHEDULE_DATE=${MERGE_DATE}" >> $GITHUB_ENV
+          
+          echo "파싱된 리뷰 기한: ${REVIEW_DEADLINE}"
+          echo "파싱된 머지 예정일: ${MERGE_DATE}"
+      
+      - name: Update status to "코드 리뷰 중"
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
         with:
-          script: |
-            const pr = context.payload.pull_request;
-            
-            // Get project information using GraphQL API
-            const query = `
-              query($owner: String!, $repo: String!, $prNumber: Int!) {
-                repository(owner: $owner, name: $repo) {
-                  pullRequest(number: $prNumber) {
-                    projectItems(first: 1) {
-                      nodes {
-                        project {
-                          title
-                        }
-                        fieldValues(first: 10) {
-                          nodes {
-                            ... on ProjectV2ItemFieldDateValue {
-                              date
-                              field {
-                                ... on ProjectV2Field {
-                                  name
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            `;
-            
-            const variables = {
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              prNumber: pr.number
-            };
-            
-            const response = await github.graphql(query, variables);
-            const projectItem = response.repository.pullRequest.projectItems.nodes[0];
-            
-            if (!projectItem) {
-              return {
-                review_due_date: 'Not set',
-                merge_due_date: 'Not set'
-              };
-            }
-            
-            const fields = projectItem.fieldValues.nodes;
-            const reviewDueDate = fields.find(field => 
-              field?.field?.name === '리뷰 마감일'
-            )?.date || 'Not set';
-            
-            const mergeDueDate = fields.find(field => 
-              field?.field?.name === '머지 예정일'
-            )?.date || 'Not set';
-            
-            return {
-              review_due_date: reviewDueDate,
-              merge_due_date: mergeDueDate
-            };
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "Status"
+          field-value: "코드 리뷰 중"
+
+      - name: Update review deadline
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "리뷰 마감일"
+          field-value: "${{ env.REVIEW_DEADLINE }}"
+
+      - name: Update merge schedule date
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "작업 완료/머지 예정일"
+          field-value: "${{ env.MERGE_SCHEDULE_DATE }}"
 
       - name: Send Discord notification
         uses: actions/github-script@v7
         with:
           script: |
-            const pr = context.payload.pull_request;
-            const author = pr.user.login;
-            const reviewers = pr.requested_reviewers.map(r => r.login);
+            // 환경 변수에 정의된 Discord ID 매핑 객체 생성
+            const discordIdMap = {
+              jjeongsu: "${{env.jjeongsu}}",
+              kimhyunjee: "${{env.kimhyunjee}}",
+              robinjoon: "${{env.robinjoon}}",
+              sangxxjin: "${{env.sangxxjin}}",
+              // 필요하다면 다른 팀원들의 ID도 여기에 추가
+            };
+
+            // 모든 요청된 리뷰어 멘션 생성
+            const requestedReviewers = "${{ env.REVIEWERS }}";
+            const requestedReviewersArray = requestedReviewers.split(',');
             
-            // Get GitHub to Discord ID mapping from secrets
-            const idMapping = JSON.parse(process.env.USERNAME_DISCORD_MAPPING);
-            const authorReviewerMapping = JSON.parse(process.env.AUTHOR_REVIEWER_MAPPING);
-            
-            // Set PR author as assignee
-            await github.rest.issues.addAssignees({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: pr.number,
-              assignees: [author]
-            });
-            
-            // Get Discord IDs
-            const authorDiscordId = idMapping[author] || author;
-            let reviewerDiscordIds;
-            
-            if (reviewers.length > 0) {
-              // 명시적으로 지정된 리뷰어가 있는 경우
-              reviewerDiscordIds = reviewers.map(r => idMapping[r] || r);
+            let reviewerMentions = '';
+            if (requestedReviewersArray && requestedReviewersArray.length > 0) {
+              reviewerMentions = requestedReviewersArray.map(reviewer => {
+                const discordId = discordIdMap[reviewer];
+                return discordId;
+              }).filter(id => id != null).map(id => `<@${id}>`).join(', ');
             } else {
-              // 리뷰어가 지정되지 않은 경우, 작성자별 기본 리뷰어 사용
-              const defaultReviewer = authorReviewerMapping[author];
-              if (!defaultReviewer) {
-                throw new Error(`${author}님의 기본 리뷰어가 설정되지 않았습니다.`);
-              }
-              reviewerDiscordIds = [idMapping[defaultReviewer] || defaultReviewer];
-              
-              // 기본 리뷰어를 PR에 자동으로 지정
-              await github.rest.pulls.requestReviewers({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                reviewers: [defaultReviewer]
-              });
+              reviewerMentions = '리뷰어 없음';
             }
-            
-            const reviewerMentions = reviewerDiscordIds.map(id => `<@${id}>`).join(', ');
-            const authorMention = `<@${authorDiscordId}>`;
-            
+
+            const authorMention = `<@${{env.ASSIGNEE_DISCORD_ID}}>`;
+
+            // 리뷰 요청 메시지 구성
+            let reviewRequestValue = '';
+            if (reviewerMentions === '리뷰어 없음' || reviewerMentions === '') {
+                reviewRequestValue = `${authorMention}님의 새로운 PR이 등록되었습니다.`;
+            } else {
+                reviewRequestValue = `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`;
+            }
+
             const message = {
+              username: "코드리뷰 해주세요",
+              avatar_url: "https://cdn.discordapp.com/avatars/1374003366165872650/c65b1980f3d7a99efdedf866d593b94f.webp?size=160",
               embeds: [{
-                title: pr.title,
-                url: pr.html_url,
+                title: "${{ github.event.pull_request.title }}",
+                url: "${{ github.event.pull_request.html_url }}",
                 color: 0x5865F2,
                 fields: [
                   {
                     name: 'Review Request',
-                    value: `${reviewerMentions}님 ${authorMention}의 리뷰 요청이 있습니다.`
+                    value: reviewRequestValue
                   },
                   {
                     name: 'Review Due Date',
-                    value: '${{ steps.pr_info.outputs.review_due_date }}'
+                    value: '${{ env.REVIEW_DEADLINE }}',
                   },
                   {
                     name: 'Merge Due Date',
-                    value: '${{ steps.pr_info.outputs.merge_due_date }}'
+                    value: '${{ env.MERGE_SCHEDULE_DATE }}',
                   }
                 ]
               }]
@@ -155,5 +135,3 @@ jobs:
             });
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          USERNAME_DISCORD_MAPPING: ${{ secrets.USERNAME_DISCORD_MAPPING }}
-          AUTHOR_REVIEWER_MAPPING: ${{ secrets.AUTHOR_REVIEWER_MAPPING }} 
