@@ -63,7 +63,7 @@ jobs:
             const reviewerMention = `<@${{env.REVIEWER_DISCORD_ID}}>`;
 
             // 리뷰 요청 메시지 구성
-            let reviewRequestValue = `${authorMention}님 ${reviewerMentions}이 리뷰를 완료했습니다.`;
+            let reviewRequestValue = `${authorMention}님 ${reviewerMention}이 리뷰를 완료했습니다.`;
 
             const message = {
               username: "코드리뷰 했어요",
