@@ -1,0 +1,178 @@
+name: PR Notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Dump GitHub context
+        id: dump_context
+        run: echo '${{ toJSON(github.event) }}'
+
+      - name: Get PR Info and Extract Linked Issues
+        id: extract_issues
+        run: |
+          PR_BODY='${{ github.event.pull_request.body }}'
+          echo "PR Body: $PR_BODY"
+          
+          # PR 본문에서 연결된 이슈 번호 추출 (closes, fixes, resolves 키워드 사용)
+          LINKED_ISSUES=$(echo "$PR_BODY" | grep -oiE "(closes?|fixes?|resolves?) #([0-9]+)" | grep -oE "#[0-9]+" | sed 's/#//' | tr '\n' ',' | sed 's/,$//')
+          echo "Linked issues: $LINKED_ISSUES"
+          echo "LINKED_ISSUES=$LINKED_ISSUES" >> $GITHUB_ENV
+    
+      - name: Send Discord notification
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Discord 알림 로직을 여기에 추가할 수 있습니다
+            console.log('PR opened:', context.payload.pull_request.title);
+      
+      - name: Update linked issues status to "코드 리뷰 중"
+        if: steps.extract_issues.outputs.linked_issues != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          script: |
+            const linkedIssues = '${{ env.LINKED_ISSUES }}';
+            if (!linkedIssues) {
+              console.log('No linked issues found');
+              return;
+            }
+            
+            const issueNumbers = linkedIssues.split(',').filter(num => num.trim());
+            console.log('Processing issues:', issueNumbers);
+            
+            // 프로젝트 정보
+            const projectNumber = 18;
+            const orgName = 'JECT-Study';
+            
+            for (const issueNumber of issueNumbers) {
+              try {
+                console.log(`Processing issue #${issueNumber}`);
+                
+                // 1. 이슈 정보 가져오기
+                const issue = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(issueNumber)
+                });
+                
+                // 2. 프로젝트 정보 가져오기
+                const projectQuery = `
+                  query($org: String!, $number: Int!) {
+                    organization(login: $org) {
+                      projectV2(number: $number) {
+                        id
+                        fields(first: 20) {
+                          nodes {
+                            ... on ProjectV2Field {
+                              id
+                              name
+                            }
+                            ... on ProjectV2SingleSelectField {
+                              id
+                              name
+                              options {
+                                id
+                                name
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+                
+                const projectData = await github.graphql(projectQuery, {
+                  org: orgName,
+                  number: projectNumber
+                });
+                
+                const project = projectData.organization.projectV2;
+                const statusField = project.fields.nodes.find(field => field.name === 'Status');
+                
+                if (!statusField) {
+                  console.log('Status field not found in project');
+                  continue;
+                }
+                
+                const reviewOption = statusField.options?.find(option => option.name === '코드 리뷰 중');
+                if (!reviewOption) {
+                  console.log('코드 리뷰 중 option not found in Status field');
+                  continue;
+                }
+                
+                // 3. 이슈와 연결된 프로젝트 아이템 찾기
+                const itemQuery = `
+                  query($org: String!, $number: Int!, $issueId: ID!) {
+                    organization(login: $org) {
+                      projectV2(number: $number) {
+                        items(first: 100) {
+                          nodes {
+                            id
+                            content {
+                              ... on Issue {
+                                id
+                                number
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+                
+                const itemData = await github.graphql(itemQuery, {
+                  org: orgName,
+                  number: projectNumber,
+                  issueId: issue.data.node_id
+                });
+                
+                const projectItem = itemData.organization.projectV2.items.nodes.find(
+                  item => item.content?.id === issue.data.node_id
+                );
+                
+                if (!projectItem) {
+                  console.log(`Issue #${issueNumber} not found in project`);
+                  continue;
+                }
+                
+                // 4. 프로젝트 아이템의 Status 업데이트
+                const updateMutation = `
+                  mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                    updateProjectV2ItemFieldValue(input: {
+                      projectId: $projectId
+                      itemId: $itemId
+                      fieldId: $fieldId
+                      value: {
+                        singleSelectOptionId: $optionId
+                      }
+                    }) {
+                      projectV2Item {
+                        id
+                      }
+                    }
+                  }
+                `;
+                
+                await github.graphql(updateMutation, {
+                  projectId: project.id,
+                  itemId: projectItem.id,
+                  fieldId: statusField.id,
+                  optionId: reviewOption.id
+                });
+                
+                console.log(`Successfully updated issue #${issueNumber} status to "코드 리뷰 중"`);
+                
+              } catch (error) {
+                console.error(`Error processing issue #${issueNumber}:`, error);
+              }
+            }
