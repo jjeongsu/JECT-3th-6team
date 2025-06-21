@@ -1,0 +1,24 @@
+name: 'Change project status to code review'
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  pull-requests: read
+  issues: read
+  contents: read
+
+jobs:
+  change_project_status_to_code_review:
+    name: Change project status to code review
+    runs-on: ubuntu-latest
+    steps:          
+      - name: Update status to "코드 리뷰 중"
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        if: contains(github.event.issue.labels.*.name, 'pr_created')
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "Status"
+          field-value: "코드 리뷰 중"
