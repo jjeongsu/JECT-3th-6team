@@ -29,7 +29,7 @@ jobs:
           echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
           
           # PR 본문을 변수에 안전하게 저장 (이전과 동일)
-          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_BODY='${{ github.event.pull_request.body }}'
           
           # --- [수정된 핵심 파싱 로직] ---
           # 1. '^'를 사용해 '라인의 시작'이 일치하는 경우만 찾도록 정확도 향상
