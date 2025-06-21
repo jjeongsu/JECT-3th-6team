@@ -30,7 +30,7 @@ jobs:
           echo "REVIEW_STATUS=${{ github.event.review.state }}" >> $GITHUB_ENV
 
           # PR 본문을 쉘 변수로 가져옵니다.
-          PR_BODY="${{ github.event.pull_request.body }}"
+          PR_BODY='${{ github.event.pull_request.body }}'
 
           # "리뷰 요청 기한:" 라인을 찾아 콜론(:)을 기준으로 두 번째 필드를 가져오고, 앞뒤 공백을 제거합니다.
           REVIEW_DEADLINE=$(echo "$PR_BODY" | grep "리뷰 요청 기한:" | sed 's/.*리뷰 요청 기한:\s*//' | tr -d '\n\r' | xargs)
