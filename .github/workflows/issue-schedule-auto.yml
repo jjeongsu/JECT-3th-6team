@@ -34,14 +34,6 @@ jobs:
           
           echo "파싱된 시작일: ${START_DATE}"
           echo "파싱된 완료일: ${END_DATE}"
-      
-      - name: Update status to "시작 전"
-        uses: nipe0324/update-project-v2-item-field@v2.0.2
-        with:
-          project-url: https://github.com/orgs/JECT-Study/projects/18
-          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
-          field-name: "Status"
-          field-value: "시작 전"
 
       - name: Update start date
         uses: nipe0324/update-project-v2-item-field@v2.0.2
