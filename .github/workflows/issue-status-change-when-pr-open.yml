@@ -32,8 +32,8 @@ jobs:
           script: |
               // ------------------- CONFIGURATION -------------------
               // ❗️ 아래 변수들을 사용자의 환경에 맞게 수정하세요.
-              const PROJECT_OWNER = context.repo.owner;
-              const PROJECT_NUMBER = 1;
+              const PROJECT_OWNER = 'JECT-Study';
+              const PROJECT_NUMBER = 18;
               const STATUS_FIELD_NAME = 'Status';
               const TARGET_STATUS_VALUE = '코드 리뷰 중';
               // -----------------------------------------------------
