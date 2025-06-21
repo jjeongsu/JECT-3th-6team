@@ -25,7 +25,7 @@ jobs:
         id: assignees
         run: |
           # PR 작성자 및 리뷰어 정보 설정 (이전과 동일)
-          echo "ASSIGNEE_LOGIN=${{ github.event.pull_request.assignee.login }}" >> $GITHUB_ENV
+          echo "ASSIGNEE_DISCORD_ID=${{ env[github.event.pull_request.assignee.login] }}" >> $GITHUB_ENV
           echo "REVIEWERS=${{ join(github.event.pull_request.requested_reviewers.*.login, ',') }}" >> $GITHUB_ENV
           
           # PR 본문을 변수에 안전하게 저장 (이전과 동일)
