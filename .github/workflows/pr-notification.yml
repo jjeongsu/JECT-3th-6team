@@ -2,7 +2,7 @@ name: PR Notification
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, edited]
+    types: [opened, reopened, review_requested]
 
 env:
   jjeongsu: ${{secrets.JJEONGSU_DISCORD_ID}}
