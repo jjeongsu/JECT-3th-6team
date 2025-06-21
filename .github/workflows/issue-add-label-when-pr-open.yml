@@ -1,0 +1,41 @@
+name: 'Add label to issues when PR is opened'
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions: write-all
+
+jobs:
+  update_issue_project_status:
+    name: Add label to issues when PR is opened
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR Info and Extract Linked Issues
+        id: extract_issues
+        run: |
+          PR_BODY='${{ github.event.pull_request.body }}'
+          echo "PR Body: $PR_BODY"
+          
+          # PR 본문에서 연결된 이슈 번호 추출 (closes, fixes, resolves 키워드 사용)
+          LINKED_ISSUES=$(echo "$PR_BODY" | grep -oiE "(closes?|fixes?|resolves?) #([0-9]+)" | grep -oE "#[0-9]+" | sed 's/#//' | tr '\n' ',' | sed 's/,$//')
+          echo "Linked issues: $LINKED_ISSUES"
+          echo "LINKED_ISSUES=$LINKED_ISSUES" >> $GITHUB_ENV  
+      - name: Update label to issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const linkedIssues = '${{ env.LINKED_ISSUES }}';
+            console.log('Linked issues:', linkedIssues);
+            
+            // 연결된 이슈 번호 배열로 변환
+            const issueNumbers = linkedIssues.split(',').map(num => parseInt(num));
+            issueNumbers.forEach(issueNumber => {
+              github.rest.issues.addLabels({
+                issue_number: issueNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: ['pr_created']
+              })
+            });
+              
