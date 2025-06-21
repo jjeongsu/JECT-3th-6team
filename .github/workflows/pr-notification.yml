@@ -2,7 +2,7 @@ name: PR Notification
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, edited]
 
 env:
   jjeongsu: ${{secrets.JJEONGSU_DISCORD_ID}}
@@ -34,8 +34,8 @@ jobs:
           # --- [수정된 핵심 파싱 로직] ---
           # 1. '^'를 사용해 '라인의 시작'이 일치하는 경우만 찾도록 정확도 향상
           # 2. '|| true'를 추가해 grep이 해당 라인을 찾지 못해도 워크플로우가 실패하지 않도록 안정성 확보
-          REVIEW_DEADLINE=$(echo "$PR_BODY" | grep "^리뷰 요청 기한:" | sed 's/.*리뷰 요청 기한:\s*//' | tr -d '\n\r' | xargs || true)
-          MERGE_DATE=$(echo "$PR_BODY" | grep "^머지 예정일:" | sed 's/.*머지 예정일:\s*//' | tr -d '\n\r' | xargs || true)
+          REVIEW_DEADLINE=$(echo "$PR_BODY" | sed -n 's/.*리뷰 요청 기한:\s*//p' | tr -d '\n\r' | xargs)
+          MERGE_DATE=$(echo "$PR_BODY" | sed -n 's/.*머지 예정일:\s*//p' | tr -d '\n\r' | xargs)
           
           # 파싱된 결과를 후속 스텝에서 사용할 수 있도록 환경 변수로 설정 (이전과 동일)
           echo "REVIEW_DEADLINE=${REVIEW_DEADLINE}" >> $GITHUB_ENV
