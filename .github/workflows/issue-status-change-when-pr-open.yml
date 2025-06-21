@@ -61,8 +61,8 @@ jobs:
   
               // GraphQL 쿼리: 프로젝트의 필드 정보는 한 번만 가져옵니다.
               const projectDataResponse = await github.graphql(`
-                query getProjectFields($owner: String!, $projectNumber: Int!) {
-                  user(login: $owner) {
+                query getProjectFields($org: String!, $projectNumber: Int!) {
+                  organization(login: $org) {
                     projectV2(number: $projectNumber) {
                       id
                       fields(first: 20) {
@@ -80,7 +80,7 @@ jobs:
                     }
                   }
                 }`,
-                { owner: PROJECT_OWNER, projectNumber: PROJECT_NUMBER }
+                { org: PROJECT_OWNER, projectNumber: PROJECT_NUMBER }
               );
   
               const project = projectDataResponse.user.projectV2;
