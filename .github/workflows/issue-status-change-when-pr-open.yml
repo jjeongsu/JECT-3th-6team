@@ -1,172 +1,132 @@
-name: PR Notification
+name: 'Update Linked Issue Status via API'
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: read
+  issues: read
+  contents: read
 
 jobs:
-  notify-discord:
+  update_issue_project_status:
+    name: Update Issue Status in Project
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Dump GitHub context
-        id: dump_context
-        run: echo '${{ toJSON(github.event) }}'
-
-      - name: Get PR Info and Extract Linked Issues
-        id: extract_issues
-        run: |
-          PR_BODY='${{ github.event.pull_request.body }}'
-          echo "PR Body: $PR_BODY"
-          
-          # PR 본문에서 연결된 이슈 번호 추출 (closes, fixes, resolves 키워드 사용)
-          LINKED_ISSUES=$(echo "$PR_BODY" | grep -oiE "(closes?|fixes?|resolves?) #([0-9]+)" | grep -oE "#[0-9]+" | sed 's/#//' | tr '\n' ',' | sed 's/,$//')
-          echo "Linked issues: $LINKED_ISSUES"
-          echo "LINKED_ISSUES=$LINKED_ISSUES" >> $GITHUB_ENV
-    
-
-      - name: Update linked issues status to "코드 리뷰 중"
-        if: env.LINKED_ISSUES != ''
+      - name: Update project status using GitHub API
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
           script: |
-            const linkedIssues = '${{ env.LINKED_ISSUES }}';
-            if (!linkedIssues) {
-              console.log('No linked issues found');
+            // ------------------- CONFIGURATION -------------------
+            // ❗️ 아래 변수들을 사용자의 환경에 맞게 수정하세요.
+            const PROJECT_OWNER = 'JECT-Study'; // 프로젝트 소유자 (개인 or 조직)
+            const PROJECT_NUMBER = 18;                 // 대상 프로젝트의 번호
+            const STATUS_FIELD_NAME = 'Status';       // 상태를 나타내는 필드의 이름 (예: '상태')
+            const TARGET_STATUS_VALUE = '코드 리뷰 중'; // 변경하고자 하는 상태 값
+            // -----------------------------------------------------
+
+            const prBody = context.payload.pull_request.body;
+            if (!prBody) {
+              core.info("PR body is empty. Skipping.");
               return;
             }
-            
-            const issueNumbers = linkedIssues.split(',').filter(num => num.trim());
-            console.log('Processing issues:', issueNumbers);
-            
-            // 프로젝트 정보
-            const projectNumber = 18;
-            const orgName = 'JECT-Study';
-            
-            for (const issueNumber of issueNumbers) {
-              try {
-                console.log(`Processing issue #${issueNumber}`);
-                
-                // 1. 이슈 정보 가져오기
-                const issue = await github.rest.issues.get({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: parseInt(issueNumber)
-                });
-                
-                // 2. 프로젝트 정보 가져오기
-                const projectQuery = `
-                  query($org: String!, $number: Int!) {
-                    organization(login: $org) {
-                      projectV2(number: $number) {
-                        id
-                        fields(first: 20) {
-                          nodes {
-                            ... on ProjectV2Field {
-                              id
-                              name
-                            }
-                            ... on ProjectV2SingleSelectField {
-                              id
-                              name
-                              options {
-                                id
-                                name
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                `;
-                
-                const projectData = await github.graphql(projectQuery, {
-                  org: orgName,
-                  number: projectNumber
-                });
-                
-                const project = projectData.organization.projectV2;
-                const statusField = project.fields.nodes.find(field => field.name === 'Status');
-                
-                if (!statusField) {
-                  console.log('Status field not found in project');
-                  continue;
-                }
-                
-                const reviewOption = statusField.options?.find(option => option.name === '코드 리뷰 중');
-                if (!reviewOption) {
-                  console.log('코드 리뷰 중 option not found in Status field');
-                  continue;
-                }
-                
-                // 3. 이슈와 연결된 프로젝트 아이템 찾기
-                const itemQuery = `
-                  query($org: String!, $number: Int!, $issueId: ID!) {
-                    organization(login: $org) {
-                      projectV2(number: $number) {
-                        items(first: 100) {
-                          nodes {
-                            id
-                            content {
-                              ... on Issue {
-                                id
-                                number
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                `;
-                
-                const itemData = await github.graphql(itemQuery, {
-                  org: orgName,
-                  number: projectNumber,
-                  issueId: issue.data.node_id
-                });
-                
-                const projectItem = itemData.organization.projectV2.items.nodes.find(
-                  item => item.content?.id === issue.data.node_id
-                );
-                
-                if (!projectItem) {
-                  console.log(`Issue #${issueNumber} not found in project`);
-                  continue;
-                }
-                
-                // 4. 프로젝트 아이템의 Status 업데이트
-                const updateMutation = `
-                  mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
-                    updateProjectV2ItemFieldValue(input: {
-                      projectId: $projectId
-                      itemId: $itemId
-                      fieldId: $fieldId
-                      value: {
-                        singleSelectOptionId: $optionId
-                      }
-                    }) {
-                      projectV2Item {
-                        id
-                      }
-                    }
-                  }
-                `;
-                
-                await github.graphql(updateMutation, {
-                  projectId: project.id,
-                  itemId: projectItem.id,
-                  fieldId: statusField.id,
-                  optionId: reviewOption.id
-                });
-                
-                console.log(`Successfully updated issue #${issueNumber} status to "코드 리뷰 중"`);
-                
-              } catch (error) {
-                console.error(`Error processing issue #${issueNumber}:`, error);
-              }
+
+            // 정규표현식을 사용해 'Closes', 'Fixes', 'Resolves' 키워드와 함께 명시된 이슈 번호를 찾습니다.
+            const issueNumberMatch = prBody.match(/(?:closes|fixes|resolves)\s#(\d+)/i);
+            if (!issueNumberMatch) {
+              core.info("No linked issue found in PR body. Skipping.");
+              return;
             }
+
+            const issueNumber = parseInt(issueNumberMatch[1], 10);
+            core.info(`Found linked issue #${issueNumber}.`);
+
+            // GraphQL 쿼리: 프로젝트, 이슈, 상태 필드 및 상태 옵션의 ID를 한 번에 가져옵니다.
+            const response = await github.graphql(`
+              query getProjectAndIssueIDs($owner: String!, $projectNumber: Int!, $issueNumber: Int!) {
+                user(login: $owner) {
+                  projectV2(number: $projectNumber) {
+                    id
+                    fields(first: 20) {
+                      nodes {
+                        ... on ProjectV2SingleSelectField {
+                          id
+                          name
+                          options {
+                            id
+                            name
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                repository(owner: $owner, name: "${context.repo.repo}") {
+                  issue(number: $issueNumber) {
+                    id
+                  }
+                }
+              }`,
+              { owner: PROJECT_OWNER, projectNumber: PROJECT_NUMBER, issueNumber: issueNumber }
+            );
+
+            const project = response.user.projectV2;
+            const issueId = response.repository.issue.id;
+
+            if (!project) {
+              core.setFailed(`Project not found for owner ${PROJECT_OWNER} and number ${PROJECT_NUMBER}`);
+              return;
+            }
+             if (!issueId) {
+              core.setFailed(`Issue #${issueNumber} not found.`);
+              return;
+            }
+
+            const statusField = project.fields.nodes.find(field => field.name === STATUS_FIELD_NAME);
+            if (!statusField) {
+              core.setFailed(`Status field "${STATUS_FIELD_NAME}" not found in project.`);
+              return;
+            }
+
+            const statusOption = statusField.options.find(option => option.name === TARGET_STATUS_VALUE);
+            if (!statusOption) {
+              core.setFailed(`Status value "${TARGET_STATUS_VALUE}" not found in the "${STATUS_FIELD_NAME}" field.`);
+              return;
+            }
+
+            const projectId = project.id;
+            const statusFieldId = statusField.id;
+            const statusOptionId = statusOption.id;
+            
+            core.info('All required IDs found. Proceeding to update the issue status.');
+
+            // GraphQL 뮤테이션: 이슈를 프로젝트에 추가하고(이미 있다면 그냥 아이템 ID를 반환) 상태를 업데이트합니다.
+            await github.graphql(`
+              mutation addIssueToProjectAndUpdateStatus($projectId: ID!, $issueId: ID!, $statusFieldId: ID!, $statusOptionId: String!) {
+                addProjectV2ItemById(input: {projectId: $projectId, contentId: $issueId}) {
+                  item {
+                    id
+                  }
+                }
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $projectId,
+                  itemId: $issueId,
+                  fieldId: $statusFieldId,
+                  value: { singleSelectOptionId: $statusOptionId }
+                }) {
+                  projectV2Item {
+                    id
+                  }
+                }
+              }`,
+              {
+                projectId: projectId,
+                issueId: issueId,
+                statusFieldId: statusFieldId,
+                statusOptionId: statusOptionId
+              }
+            );
+
+            core.info(`Successfully updated issue #${issueNumber} status to "${TARGET_STATUS_VALUE}" in project.`);
