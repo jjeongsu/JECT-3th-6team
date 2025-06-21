@@ -27,6 +27,11 @@ assignees: ''
 ## 해결 방안
 예상되는 해결 방법이 있다면 작성해주세요.
 
+## 예상 소요 기간
+**변경 예상 시 반드시 바꿔주세요**
+- 시작일: YYYY-MM-dd
+- 완료일: YYYY-MM-dd
+
 ## 환경 정보
 - OS: [예: iOS, Windows]
 - 브라우저: [예: Chrome, Safari]
