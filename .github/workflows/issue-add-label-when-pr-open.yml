@@ -4,10 +4,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 
-permissions:
-  pull-requests: read
-  issues: read
-  contents: read
+permissions: write-all
 
 jobs:
   update_issue_project_status:

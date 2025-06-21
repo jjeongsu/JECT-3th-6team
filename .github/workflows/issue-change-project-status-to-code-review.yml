@@ -4,11 +4,6 @@ on:
   issues:
     types: [labeled]
 
-permissions:
-  pull-requests: read
-  issues: read
-  contents: read
-
 jobs:
   change_project_status_to_code_review:
     name: Change project status to code review
