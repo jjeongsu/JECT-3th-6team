@@ -1,6 +1,5 @@
 package com.example.demo.domain.model;
 
-import java.time.LocalDate;
 import java.util.Map;
 /**
  * 팝업스토어 도메인 엔티티
@@ -30,14 +29,9 @@ public record Popup(
         if (capacitySchedule == null || capacitySchedule.isEmpty()) {
             throw new IllegalArgumentException("예약 수용 인원 일정은 비어 있을 수 없습니다.");
         }
-        for (Map.Entry<LocalDate, Map<TimeSlot, Integer>> dateEntry : capacitySchedule.entries()) {
-            if (dateEntry.getValue() == null || dateEntry.getValue().isEmpty()) {
-                throw new IllegalArgumentException("각 날짜의 수용 인원 정보는 비어 있을 수 없습니다.");
-            }
-            for (Map.Entry<TimeSlot, Integer> slotEntry : dateEntry.getValue().entrySet()) {
-                if (slotEntry.getValue() == null || slotEntry.getValue() <= 0) {
-                    throw new IllegalArgumentException("각 시간대의 최대 수용 인원은 1 이상이어야 합니다.");
-                }
+        for (Map.Entry<DateTimeSlot, Integer> entry : capacitySchedule.entries()) {
+            if (entry.getValue() <= 0) {
+                throw new IllegalArgumentException("각 슬롯의 최대 수용 인원은 1 이상이어야 합니다.");
             }
         }
         if (openingHours == null) {
@@ -52,7 +46,7 @@ public record Popup(
      * 특정 날짜와 시간대에 대한 최대 수용 인원을 반환합니다.
      * 정보가 없으면 0을 반환합니다.
      */
-    public int capacityOf(LocalDate date, TimeSlot timeSlot) {
-        return capacitySchedule.capacityOf(date, timeSlot);
+    public int capacityOf(DateTimeSlot slot) {
+        return capacitySchedule.capacityOf(slot);
     }
 } 
