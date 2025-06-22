@@ -9,15 +9,13 @@ import java.util.Map;
  * @param location          주소
  * @param capacitySchedule  날짜별 시간대별 최대 수용 인원 맵
  * @param openingHours      영업 시간 범위
- * @param reservationPolicy 예약 정책
  */
 public record Popup(
         Long id,
         String name,
         Address location,
         CapacitySchedule capacitySchedule,
-        TimeRange openingHours,
-        ReservationPolicy reservationPolicy
+        TimeRange openingHours
 ) {
     public Popup {
         if (name == null || name.isBlank()) {
@@ -36,9 +34,6 @@ public record Popup(
         }
         if (openingHours == null) {
             throw new IllegalArgumentException("영업 시간은 필수 값입니다.");
-        }
-        if (reservationPolicy == null) {
-            throw new IllegalArgumentException("예약 정책은 필수 값입니다.");
         }
     }
 
