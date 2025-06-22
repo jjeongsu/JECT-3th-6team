@@ -4,8 +4,6 @@ on:
   pull_request:
     types: [opened]
 
-permissions: write-all
-
 jobs:
   update_issue_project_status:
     name: Add label to issues when PR is opened
@@ -24,6 +22,7 @@ jobs:
       - name: Update label to issues
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
           script: |
             const linkedIssues = '${{ env.LINKED_ISSUES }}';
             console.log('Linked issues:', linkedIssues);
