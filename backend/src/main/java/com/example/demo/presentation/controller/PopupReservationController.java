@@ -31,7 +31,7 @@ public class PopupReservationController {
     public ResponseEntity<List<ReservationTimeSlotDto>> getAvailableTimes(
             @PathVariable Long popupId,
             @RequestParam LocalDate date,
-            @RequestParam Integer peopleCount) {
+            @RequestParam int peopleCount) {
         return ResponseEntity.ok(reservationAvailabilityService.getAvailability(popupId, date, peopleCount)
                 .stream()
                 .map(it -> new ReservationTimeSlotDto(it.time(), it.available()))
