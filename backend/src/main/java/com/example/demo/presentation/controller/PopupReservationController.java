@@ -1,7 +1,6 @@
 package com.example.demo.presentation.controller;
 
 import com.example.demo.application.service.ReservationAvailabilityService;
-import com.example.demo.presentation.dto.ReservationAvailableTimesResponse;
 import com.example.demo.presentation.dto.ReservationTimeSlotDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
