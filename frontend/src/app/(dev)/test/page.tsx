@@ -44,7 +44,6 @@ function ReservationPage() {
         </Button>
       </div>
 
-      {/*TODO : 캘린더 컴포넌트 캠슐화 다듬기*/}
       <MonthlyCalendar selectedDate={date} onClick={value => setDate(value)} />
     </div>
   );
