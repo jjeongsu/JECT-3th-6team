@@ -43,4 +43,8 @@ public record Reservation(
     public Reservation withStatus(ReservationStatus newStatus) {
         return new Reservation(id, popupId, memberId, slot, peopleCount, newStatus);
     }
+
+    public Reservation withId(Long id) {
+        return new Reservation(id, popupId, memberId, slot, peopleCount, status);
+    }
 } 
