@@ -1,0 +1,27 @@
+name: 'Change project status when label added'
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  change_project_status:
+    name: Change project status when label added
+    runs-on: ubuntu-latest
+    steps:          
+      - name: Update status to "코드 리뷰 중"
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        if: contains(github.event.issue.labels.*.name, 'pr_created') && !contains(github.event.issue.labels.*.name, 'pr_merged')
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "Status"
+          field-value: "코드 리뷰 중"
+      - name: Update status to "완료"
+        uses: nipe0324/update-project-v2-item-field@v2.0.2
+        if: contains(github.event.issue.labels.*.name, 'pr_merged')
+        with:
+          project-url: https://github.com/orgs/JECT-Study/projects/18
+          github-token: ${{ secrets.UPDATE_PROJECT_V2_PAT }}
+          field-name: "Status"
+          field-value: "완료"
