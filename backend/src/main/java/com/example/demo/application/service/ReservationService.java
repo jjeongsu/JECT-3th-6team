@@ -1,6 +1,7 @@
 package com.example.demo.application.service;
 
-import com.example.demo.application.dto.ReservationCreateResponse;
+import com.example.demo.application.dto.ReservationCreateInput;
+import com.example.demo.application.dto.ReservationCreateResult;
 import com.example.demo.application.port.out.PopupLoadPort;
 import com.example.demo.application.port.out.ReservationLoadPort;
 import com.example.demo.application.port.out.ReservationSavePort;
@@ -30,38 +31,28 @@ public class ReservationService {
     /**
      * 예약 생성
      *
-     * @param popupId 팝업 ID
-     * @param memberId 회원 ID
-     * @param reserverName 예약자 이름
-     * @param numberOfPeople 예약 인원
-     * @param email 예약자 이메일
-     * @param reservationDatetime 예약 일시
+     * @param request 예약 생성 요청 정보
      * @return 생성된 예약 정보
      */
-    public ReservationCreateResponse createReservation(
-            long popupId,
-            long memberId,
-            String reserverName, 
-            int  numberOfPeople,
-            String email, 
-            LocalDateTime reservationDatetime
-    ) {
+    public ReservationCreateResult createReservation(ReservationCreateInput request) {
+
+        LocalDateTime reservationDatetime = request.reservationDatetime();
+        validateInput(request.reserverName(), request.numberOfPeople(), request.email(), reservationDatetime);
         
-        validateInput(reserverName, numberOfPeople, email, reservationDatetime);
-        
-        Popup popup = popupLoadPort.findById(popupId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팝업입니다. popupId: " + popupId));
+        Popup popup = popupLoadPort.findById(request.popupId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팝업입니다. popupId: " + request.popupId()));
         
         DateTimeSlot slot = new DateTimeSlot(reservationDatetime.toLocalDate(), reservationDatetime.toLocalTime());
         
-        int alreadyBooked = reservationLoadPort.countBookedPeople(popupId, slot);
+        int alreadyBooked = reservationLoadPort.countBookedPeople(request.popupId(), slot);
         
         Reservation reservation = reservationDomainService.createReservation(
-                popup, memberId, slot, alreadyBooked, numberOfPeople, reserverName, email);
+                popup, request.memberId(), slot, alreadyBooked, request.numberOfPeople(), request.reserverName(), request.email()
+        );
         
         Reservation savedReservation = reservationSavePort.save(reservation);
         
-        return new ReservationCreateResponse(
+        return new ReservationCreateResult(
                 savedReservation.id(),
                 savedReservation.popupId(),
                 savedReservation.reserverName(),

@@ -1,5 +1,7 @@
 package com.example.demo.presentation.controller;
 
+import com.example.demo.application.dto.ReservationCreateInput;
+import com.example.demo.application.dto.ReservationCreateResult;
 import com.example.demo.application.service.ReservationAvailabilityService;
 import com.example.demo.application.service.ReservationService;
 import com.example.demo.presentation.dto.ReservationCreateRequest;
@@ -57,8 +59,9 @@ public class PopupReservationController {
         
         // TODO: 현재는 회원 ID를 1로 고정 (인증 기능 추가 시 수정 필요)
         Long memberId = 1L;
-        
-        com.example.demo.application.dto.ReservationCreateResponse applicationResponse = reservationService.createReservation(
+
+        // 프레젠테이션 DTO를 애플리케이션 DTO로 변환
+        ReservationCreateInput applicationRequest = new ReservationCreateInput(
                 popupId,
                 memberId,
                 request.reserverName(),
@@ -66,7 +69,10 @@ public class PopupReservationController {
                 request.email(),
                 request.reservationDatetime()
         );
+
+        ReservationCreateResult applicationResponse = reservationService.createReservation(applicationRequest);
         
+        // 애플리케이션 DTO를 프레젠테이션 DTO로 변환
         ReservationCreateResponse response = new ReservationCreateResponse(
                 applicationResponse.reservationId(),
                 applicationResponse.popupId(),
