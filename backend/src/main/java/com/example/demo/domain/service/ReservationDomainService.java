@@ -1,6 +1,7 @@
 package com.example.demo.domain.service;
 
 import com.example.demo.domain.model.*;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalTime;
 
@@ -9,6 +10,7 @@ import java.time.LocalTime;
  * <p>
  * 단일 엔티티에 속하지 않는 예약 비즈니스 규칙을 담당합니다.
  */
+@Component
 public class ReservationDomainService {
 
     /**
@@ -51,13 +53,15 @@ public class ReservationDomainService {
      * @param slot        예약 일시
      * @param alreadyBooked 현재 이미 예약된 인원 수
      * @param peopleCount 인원 수
+     * @param reserverName 예약자 이름
+     * @param email       예약자 이메일
      * @return 생성된 예약
      */
-    public Reservation createReservation(Popup popup, Long memberId, DateTimeSlot slot, int alreadyBooked, int peopleCount) {
+    public Reservation createReservation(Popup popup, Long memberId, DateTimeSlot slot, int alreadyBooked, int peopleCount, String reserverName, String email) {
         if (!canReserve(popup, slot, alreadyBooked, peopleCount)) {
             throw new IllegalStateException("예약 조건을 만족하지 않습니다.");
         }
-        return Reservation.create(popup.id(), memberId, slot, peopleCount);
+        return Reservation.create(popup.id(), memberId, slot, peopleCount, reserverName, email);
     }
 
     /**

@@ -10,6 +10,8 @@ import java.util.Objects;
  * @param memberId    회원 ID
  * @param slot        예약 일시 슬롯
  * @param peopleCount 예약 인원
+ * @param reserverName 예약자 이름
+ * @param email       예약자 이메일
  * @param status      예약 상태
  */
 public record Reservation(
@@ -18,6 +20,8 @@ public record Reservation(
         Long memberId,
         DateTimeSlot slot,
         int peopleCount,
+        String reserverName,
+        String email,
         ReservationStatus status
 ) {
     public Reservation {
@@ -27,20 +31,22 @@ public record Reservation(
         if (peopleCount <= 0) {
             throw new IllegalArgumentException("예약 인원은 1명 이상이어야 합니다.");
         }
+        Objects.requireNonNull(reserverName, "예약자 이름은 필수 값입니다.");
+        Objects.requireNonNull(email, "예약자 이메일은 필수 값입니다.");
         Objects.requireNonNull(status, "예약 상태는 필수 값입니다.");
     }
 
     /**
-     * 예약 생성 팩토리 메서드 (REQUESTED 상태)
+     * 예약 생성 팩토리 메서드 (RESERVED 상태)
      */
-    public static Reservation create(Long popupId, Long memberId, DateTimeSlot slot, int peopleCount) {
-        return new Reservation(null, popupId, memberId, slot, peopleCount, ReservationStatus.RESERVED);
+    public static Reservation create(Long popupId, Long memberId, DateTimeSlot slot, int peopleCount, String reserverName, String email) {
+        return new Reservation(null, popupId, memberId, slot, peopleCount, reserverName, email, ReservationStatus.RESERVED);
     }
 
     /**
      * 상태 변경
      */
     public Reservation withStatus(ReservationStatus newStatus) {
-        return new Reservation(id, popupId, memberId, slot, peopleCount, newStatus);
+        return new Reservation(id, popupId, memberId, slot, peopleCount, reserverName, email, newStatus);
     }
 } 
