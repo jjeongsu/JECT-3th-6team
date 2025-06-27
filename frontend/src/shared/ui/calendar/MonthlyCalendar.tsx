@@ -1,6 +1,6 @@
-import makeCalender from '@/shared/ui/calendar/monthly-calendar/lib/makeCalendar';
+import makeCalender from '@/shared/ui/calendar/lib/makeCalendar';
 import { addMonths, subMonths } from 'date-fns';
-import { dateFormatter } from '@/shared/ui/calendar/monthly-calendar/lib/dateFormatter';
+import { dateFormatter } from '@/shared/ui/calendar/lib/dateFormatter';
 import Image from 'next/image';
 import { useState } from 'react';
 

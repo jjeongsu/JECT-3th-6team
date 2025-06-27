@@ -1,7 +1,7 @@
 import React from 'react';
 import type { ButtonProps } from './types';
 
-export default function Button({
+export default function StandardButton({
   children,
   onClick,
   disabled,

@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { TextInputProps } from '@/shared/ui/input/text-input/types';
+import { TextInputProps } from '@/shared/ui/input/types';
 
 export default function TextInput({
   label,

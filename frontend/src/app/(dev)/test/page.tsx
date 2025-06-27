@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, TextInput } from '@/shared/ui';
-import MonthlyCalendar from '@/shared/ui/calendar/monthly-calendar/ui';
+import { StandardButton, TextInput } from '@/shared/ui';
+import MonthlyCalendar from '@/shared/ui/calendar/MonthlyCalendar';
 
 function ReservationPage() {
   const [input, setInput] = useState('');
@@ -24,7 +24,7 @@ function ReservationPage() {
         errorMessage={errorText}
       />
       <div className={'flex gap-2'}>
-        <Button
+        <StandardButton
           onClick={() => console.log('button')}
           disabled={false}
           color={'primary'}
@@ -32,8 +32,8 @@ function ReservationPage() {
           hasShadow={true}
         >
           버튼입니다.
-        </Button>
-        <Button
+        </StandardButton>
+        <StandardButton
           onClick={() => console.log('button')}
           disabled={false}
           color={'secondary'}
@@ -41,7 +41,7 @@ function ReservationPage() {
           hasShadow={true}
         >
           버튼
-        </Button>
+        </StandardButton>
       </div>
 
       <MonthlyCalendar selectedDate={date} onClick={value => setDate(value)} />
