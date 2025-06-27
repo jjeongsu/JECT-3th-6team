@@ -6,10 +6,10 @@ import java.time.LocalDateTime;
  * 예약 신청 응답 DTO
  */
 public record ReservationCreateResponse(
-        Long reservationId,
-        Long popupId,
+        long reservationId,
+        long popupId,
         String reserverName,
-        Integer numberOfPeople,
+        int numberOfPeople,
         String email,
         LocalDateTime reservationDatetime,
         String status

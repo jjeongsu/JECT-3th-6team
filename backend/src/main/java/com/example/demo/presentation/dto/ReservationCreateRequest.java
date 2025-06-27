@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
  */
 public record ReservationCreateRequest(
         String reserverName,
-        Integer numberOfPeople,
+        int numberOfPeople,
         String email,
         LocalDateTime reservationDatetime
 ) {
