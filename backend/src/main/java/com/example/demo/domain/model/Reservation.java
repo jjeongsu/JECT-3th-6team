@@ -51,6 +51,6 @@ public record Reservation(
     }
 
     public Reservation withId(Long id) {
-        return new Reservation(id, popupId, memberId, slot, peopleCount, status);
+        return new Reservation(id, popupId, memberId, slot, peopleCount, reserverName, email, status);
     }
 } 
