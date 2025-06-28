@@ -44,10 +44,10 @@ public class ReservationService {
         
         DateTimeSlot slot = new DateTimeSlot(reservationDatetime.toLocalDate(), reservationDatetime.toLocalTime());
         
-        int alreadyBooked = reservationLoadPort.countBookedPeople(request.popupId(), slot);
+        int alreadyBookedPeopleCount = reservationLoadPort.countBookedPeople(request.popupId(), slot);
         
         Reservation reservation = reservationDomainService.createReservation(
-                popup, request.memberId(), slot, alreadyBooked, request.numberOfPeople(), request.reserverName(), request.email()
+                popup, request.memberId(), slot, alreadyBookedPeopleCount, request.numberOfPeople(), request.reserverName(), request.email()
         );
         
         Reservation savedReservation = reservationSavePort.save(reservation);
