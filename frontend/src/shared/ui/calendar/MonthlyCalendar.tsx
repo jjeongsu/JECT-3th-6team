@@ -1,8 +1,10 @@
-import makeCalender from '@/shared/ui/calendar/lib/makeCalendar';
-import { addMonths, subMonths } from 'date-fns';
-import { dateFormatter } from '@/shared/ui/calendar/lib/dateFormatter';
 import Image from 'next/image';
 import { useState } from 'react';
+import { addMonths, subMonths } from 'date-fns';
+import makeCalender from '@/shared/ui/calendar/lib/makeCalendar';
+import { dateFormatter } from '@/shared/ui/calendar/lib/dateFormatter';
+import IconBracketLeft from '/public/icons/Normal/Icon_Bracket_Left.svg';
+import IconBracketRight from '/public/icons/Normal/Icon_Bracket_Right.svg';
 
 interface MonthlyCalendarProps {
   selectedDate: Date;
@@ -15,7 +17,7 @@ export default function MonthlyCalendar({
 }: MonthlyCalendarProps) {
   const [browsingDate, setBrowsingDate] = useState(selectedDate);
   const { currentMonthAllDates, weekDays } = makeCalender(browsingDate);
-  const [year, month] = dateFormatter(browsingDate);
+  const { year, month } = dateFormatter(browsingDate);
 
   // 다음 달로 이동
   const nextMonth = () => {
@@ -64,7 +66,7 @@ export default function MonthlyCalendar({
                 }
               >
                 <Image
-                  src="/icons/Normal/Icon_Bracket_Left.svg"
+                  src={IconBracketLeft}
                   alt="left"
                   width={18}
                   height={18}
@@ -78,7 +80,7 @@ export default function MonthlyCalendar({
                 }
               >
                 <Image
-                  src="/icons/Normal/Icon_Bracket_Right.svg"
+                  src={IconBracketRight}
                   alt="left"
                   width={18}
                   height={18}
