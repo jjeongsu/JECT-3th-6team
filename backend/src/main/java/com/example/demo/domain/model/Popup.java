@@ -1,5 +1,6 @@
 package com.example.demo.domain.model;
 
+import java.util.List;
 import java.util.Map;
 /**
  * 팝업스토어 도메인 엔티티
@@ -9,13 +10,17 @@ import java.util.Map;
  * @param location          주소
  * @param capacitySchedule  날짜별 시간대별 최대 수용 인원 맵
  * @param openingHours      영업 시간 범위
+ * @param categories        팝업 카테고리 목록
+ * @param type              팝업 타입
  */
 public record Popup(
         Long id,
         String name,
         Address location,
         CapacitySchedule capacitySchedule,
-        TimeRange openingHours
+        TimeRange openingHours,
+        List<Category> categories,
+        PopupType type
 ) {
     public Popup {
         if (name == null || name.isBlank()) {
@@ -34,6 +39,12 @@ public record Popup(
         }
         if (openingHours == null) {
             throw new IllegalArgumentException("영업 시간은 필수 값입니다.");
+        }
+        if (categories == null) {
+            throw new IllegalArgumentException("카테고리 목록은 필수 값입니다.");
+        }
+        if (type == null) {
+            throw new IllegalArgumentException("팝업 타입은 필수 값입니다.");
         }
     }
 
