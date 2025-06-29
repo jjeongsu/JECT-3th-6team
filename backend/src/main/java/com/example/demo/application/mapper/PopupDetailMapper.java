@@ -15,12 +15,7 @@ import com.example.demo.infrastructure.persistence.entity.popup.PopupContentEnti
 import com.example.demo.infrastructure.persistence.entity.popup.PopupEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupImageEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupLocationEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupReviewEntity;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -35,20 +30,11 @@ public class PopupDetailMapper {
             .map(PopupImageEntity::getUrl)
             .toList();
 
-        // 2. D-day
-        int dDay = (int) Duration.between(
-            LocalDate.now().atStartOfDay(),
-            popup.getEndDate().atStartOfDay()
-        ).toDays();
-        dDay = Math.max(dDay, 0);
-
         // 3. Rating
-        List<Integer> ratings = raw.reviews().stream()
-            .map(PopupReviewEntity::getRating)
+        List<Integer> ratingValues = raw.reviews().stream()
+            .map(r -> r.getRating())
             .toList();
-        double average = ratings.isEmpty() ? 0.0 :
-            Math.round(ratings.stream().mapToInt(r -> r).average().orElse(0.0) * 10.0) / 10.0;
-        Rating rating = new Rating(average, ratings.size());
+        Rating rating = Rating.from(ratingValues);
 
         // 4. SearchTags
         List<String> categories = raw.categories().stream()
@@ -82,10 +68,7 @@ public class PopupDetailMapper {
 
         // 8. PopupDetailInfo
         List<DayOfWeekInfo> dayOfWeeks = raw.schedules().stream()
-            .map(sch -> new DayOfWeekInfo(
-                sch.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase(),
-                sch.getOpenTime() + " ~ " + sch.getCloseTime()
-            ))
+            .map(DayOfWeekInfo::from)
             .toList();
 
         List<String> descriptions = raw.contents().stream()
@@ -98,7 +81,7 @@ public class PopupDetailMapper {
             popup.getId(),
             popup.getTitle(),
             thumbnails,
-            dDay,
+            period.dDay(),
             rating,
             searchTags,
             location,
