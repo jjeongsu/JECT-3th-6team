@@ -1,7 +1,7 @@
 package com.example.demo.presentation.controller;
 
+import com.example.demo.application.dto.PopupDetailDto;
 import com.example.demo.application.service.PopupDetailReadService;
-import com.example.demo.domain.model.PopupDetail;
 import com.example.demo.presentation.dto.PopupDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class PopupController {
 
     @GetMapping("/{popupId}")
     public ResponseEntity<PopupDetailResponse> getPopupDetail(@PathVariable Long popupId) {
-        PopupDetail popupDetail = popupDetailReadService.getPopupDetail(popupId);
-        return ResponseEntity.ok(PopupDetailResponse.fromDomain(popupDetail));
+        PopupDetailDto popupDetailDto = popupDetailReadService.getPopupDetail(popupId);
+        return ResponseEntity.ok(PopupDetailResponse.fromApplicationDto(popupDetailDto));
     }
 }

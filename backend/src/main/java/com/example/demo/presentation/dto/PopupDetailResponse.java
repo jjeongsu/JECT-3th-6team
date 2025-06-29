@@ -1,6 +1,6 @@
 package com.example.demo.presentation.dto;
 
-import com.example.demo.domain.model.PopupDetail;
+import com.example.demo.application.dto.PopupDetailDto;
 import java.util.List;
 
 public record PopupDetailResponse(
@@ -15,7 +15,7 @@ public record PopupDetailResponse(
     BrandStoryDto brandStory,
     PopupDetailInfoDto popupDetail
 ) {
-    public static PopupDetailResponse fromDomain(PopupDetail popup) {
+    public static PopupDetailResponse fromApplicationDto(PopupDetailDto popup) {
         return new PopupDetailResponse(
             popup.id(),
             popup.title(),
