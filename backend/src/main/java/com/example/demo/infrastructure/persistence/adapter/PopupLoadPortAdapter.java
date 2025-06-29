@@ -2,7 +2,7 @@ package com.example.demo.infrastructure.persistence.adapter;
 
 import static java.util.stream.Collectors.toMap;
 
-import com.example.demo.application.dto.PopupRawData;
+import com.example.demo.infrastructure.persistence.dto.PopupQueryResult;
 import com.example.demo.application.mapper.PopupDetailMapper;
 import com.example.demo.application.port.out.PopupLoadPort;
 import com.example.demo.domain.model.CapacitySchedule;
@@ -66,7 +66,7 @@ public class PopupLoadPortAdapter implements PopupLoadPort {
     public Optional<PopupDetail> findDetailById(Long popupId) {
         return popupRepository.findById(popupId).map(popup -> {
 
-            PopupRawData rawData = new PopupRawData(
+            PopupQueryResult rawData = new PopupQueryResult(
                 popup,
                 popupImageRepository.findAllByPopupIdAndTypeOrderBySortOrderAsc(popupId, PopupImageType.MAIN),
                 popupCategoryRepository.findAllByPopupId(popupId),

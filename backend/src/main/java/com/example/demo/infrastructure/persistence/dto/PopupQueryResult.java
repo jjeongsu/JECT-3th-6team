@@ -1,4 +1,4 @@
-package com.example.demo.application.dto;
+package com.example.demo.infrastructure.persistence.dto;
 
 import com.example.demo.infrastructure.persistence.entity.popup.PopupCategoryEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupContentEntity;
@@ -10,7 +10,7 @@ import com.example.demo.infrastructure.persistence.entity.popup.PopupSocialEntit
 import com.example.demo.infrastructure.persistence.entity.popup.PopupWeeklyScheduleEntity;
 import java.util.List;
 
-public record PopupRawData(
+public record PopupQueryResult(
     PopupEntity popup,
     List<PopupImageEntity> mainImages,
     List<PopupCategoryEntity> categories,

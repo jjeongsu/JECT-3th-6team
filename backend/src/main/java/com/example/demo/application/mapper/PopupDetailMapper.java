@@ -1,6 +1,6 @@
 package com.example.demo.application.mapper;
 
-import com.example.demo.application.dto.PopupRawData;
+import com.example.demo.infrastructure.persistence.dto.PopupQueryResult;
 import com.example.demo.domain.model.BrandStory;
 import com.example.demo.domain.model.DayOfWeekInfo;
 import com.example.demo.domain.model.Location;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PopupDetailMapper {
 
-    public PopupDetail toDomain(PopupRawData raw) {
+    public PopupDetail toDomain(PopupQueryResult raw) {
 
         PopupEntity popup = raw.popup();
 
