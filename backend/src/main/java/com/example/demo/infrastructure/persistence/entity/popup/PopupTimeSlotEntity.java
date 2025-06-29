@@ -1,16 +1,14 @@
 package com.example.demo.infrastructure.persistence.entity.popup;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "popup_time_slots")
+@Getter
 public class PopupTimeSlotEntity {
     // 각 요일 + 시간대 + 예약가능 인원수를 갖고 있는 테이블
     @Id
