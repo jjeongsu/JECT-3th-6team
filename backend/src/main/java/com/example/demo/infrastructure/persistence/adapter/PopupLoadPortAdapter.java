@@ -33,6 +33,7 @@ public class PopupLoadPortAdapter implements PopupLoadPort {
 
 
 
+    // robin pr(#38)의 내용으로 conflict 해결 예정
     @Override
     public Optional<Popup> findById(Long popupId) {
         return Optional.empty();
@@ -47,15 +48,13 @@ public class PopupLoadPortAdapter implements PopupLoadPort {
                 popupImageRepository.findAllByPopupIdAndTypeOrderBySortOrderAsc(popupId, PopupImageType.MAIN),
                 popupCategoryRepository.findAllByPopupId(popupId),
                 popupLocationRepository.findById(popup.getPopupLocationId())
-                    .orElseThrow(() -> new IllegalStateException("Location not found")),
+                    .orElseThrow(() -> new IllegalStateException("존재하지 않는 팝업 위치입니다.")),
                 popupReviewRepository.findAllByPopupId(popupId),
                 popupImageRepository.findAllByPopupIdAndTypeOrderBySortOrderAsc(popupId, PopupImageType.DESCRIPTION),
                 popupSocialRepository.findAllByPopupIdOrderBySortOrderAsc(popupId),
                 popupWeeklyScheduleRepository.findAllByPopupId(popupId),
                 popupContentRepository.findAllByPopupIdOrderBySortOrderAsc(popupId)
             );
-
-
             return popupDetailMapper.toDomain(rawData);
         });
     }
