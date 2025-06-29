@@ -83,7 +83,7 @@ public class PopupDetailMapper {
         // 8. PopupDetailInfo
         List<DayOfWeekInfo> dayOfWeeks = raw.schedules().stream()
             .map(sch -> new DayOfWeekInfo(
-                sch.getDayOfWeek().name(),
+                sch.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase(),
                 sch.getOpenTime() + " ~ " + sch.getCloseTime()
             ))
             .toList();
