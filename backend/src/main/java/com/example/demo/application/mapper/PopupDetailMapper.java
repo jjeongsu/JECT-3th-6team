@@ -16,7 +16,11 @@ import com.example.demo.infrastructure.persistence.entity.popup.PopupEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupImageEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupLocationEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupReviewEntity;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,8 +36,11 @@ public class PopupDetailMapper {
             .toList();
 
         // 2. D-day
-        int dDay = (int) java.time.temporal.ChronoUnit.DAYS.between(
-            java.time.LocalDate.now(), popup.getEndDate());
+        int dDay = (int) Duration.between(
+            LocalDate.now().atStartOfDay(),
+            popup.getEndDate().atStartOfDay()
+        ).toDays();
+        dDay = Math.max(dDay, 0);
 
         // 3. Rating
         List<Integer> ratings = raw.reviews().stream()
