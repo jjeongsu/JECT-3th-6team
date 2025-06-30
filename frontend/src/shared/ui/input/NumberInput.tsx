@@ -9,6 +9,7 @@ export default function NumberInput({
   max,
   min,
   onChange,
+  errorMessage = '',
 }: NumberInputProps) {
   const numberStyle = value === min ? 'text-gray60' : 'text-black';
 
@@ -25,49 +26,54 @@ export default function NumberInput({
   };
 
   return (
-    <div className={'flex w-full items-center justify-between'}>
-      <label className={'font-semibold text-sm tracking-[1.45%]'}>
-        {label}
-      </label>
-      <div
-        className={
-          'flex items-center justify-center w-40 h-12 gap-x-7 rounded-xl border border-gray40'
-        }
-      >
-        {/*마이너스 버튼*/}
-        <button
-          type={'button'}
-          className={'cursor-pointer'}
-          onClick={onMinusClick}
+    <div className={'flex flex-col gap-y-0.5'}>
+      <div className={'flex w-full items-center justify-between'}>
+        <label className={'font-semibold text-sm tracking-[1.45%] select-none'}>
+          {label}
+        </label>
+        <div
+          className={
+            'flex items-center justify-center w-40 h-12 gap-x-7 rounded-xl border border-gray40'
+          }
         >
-          <Image
-            src={IconMinus}
-            alt="number minus button"
-            width={29}
-            height={29}
-            objectFit={'cover'}
-          />
-        </button>
+          {/*마이너스 버튼*/}
+          <button
+            type={'button'}
+            className={'cursor-pointer'}
+            onClick={onMinusClick}
+          >
+            <Image
+              src={IconMinus}
+              alt="number minus button"
+              width={29}
+              height={29}
+              objectFit={'cover'}
+            />
+          </button>
 
-        <span className={`text-xl min-w-3.5 font-regular ${numberStyle}`}>
-          {value}
-        </span>
+          <span className={`text-xl min-w-3.5 font-regular ${numberStyle}`}>
+            {value}
+          </span>
 
-        {/*플러스버튼*/}
-        <button
-          type={'button'}
-          className={'cursor-pointer'}
-          onClick={onPlusClick}
-        >
-          <Image
-            src={IconPlus}
-            alt="number plus button"
-            width={29}
-            height={29}
-            objectFit={'cover'}
-          />
-        </button>
+          {/*플러스버튼*/}
+          <button
+            type={'button'}
+            className={'cursor-pointer'}
+            onClick={onPlusClick}
+          >
+            <Image
+              src={IconPlus}
+              alt="number plus button"
+              width={29}
+              height={29}
+              objectFit={'cover'}
+            />
+          </button>
+        </div>
       </div>
+      {errorMessage && (
+        <span className={'font-regular text-xs text-red'}>{errorMessage}</span>
+      )}
     </div>
   );
 }
