@@ -42,10 +42,7 @@ export function ChipExample() {
       <div className="space-y-2">
         <h3 className="text-sm font-medium">3. 아이콘이 우측에 있는 경우</h3>
         <div className="flex gap-2">
-          <Chip variant="white" icon={<XIcon />} iconPosition="right">삭제</Chip>
           <Chip variant="mainLight" icon={<XIcon />} iconPosition="right">삭제</Chip>
-          <Chip variant="main" icon={<XIcon />} iconPosition="right">삭제</Chip>
-          <Chip variant="disabled" icon={<XIcon />} iconPosition="right">삭제</Chip>
         </div>
       </div>
     </div>
