@@ -1,3 +1,5 @@
+'use client';
+
 import Image from 'next/image';
 import { useState } from 'react';
 import { addMonths, subMonths } from 'date-fns';
@@ -55,7 +57,7 @@ export default function MonthlyCalendar({
       <div className="flex flex-col ">
         {/*년/월/좌우버튼*/}
         <div className="flex items-center justify-between px-6 mb-3">
-          <div className="w-full flex place-content-between items-center">
+          <div className="w-full flex justify-between items-center">
             <span className="text-black text-xl font-semibold">{`${year}년 ${month}월`}</span>
             <div className={'flex gap-x-6'}>
               <button
@@ -101,7 +103,8 @@ export default function MonthlyCalendar({
           ))}
         </div>
         {/*날짜 */}
-        <div className="grid grid-cols-7 px-4 ">
+
+        <div className="grid grid-cols-7 place-items-center px-4">
           {currentMonthAllDates.map((date, index) => (
             <button
               key={index}
