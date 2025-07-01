@@ -35,7 +35,6 @@ export function ChipExample() {
           <Chip variant="white">white</Chip>
           <Chip variant="mainLight">mainLight</Chip>
           <Chip variant="main">main</Chip>
-          <Chip variant="disabled">disabled</Chip>
         </div>
       </div>
 

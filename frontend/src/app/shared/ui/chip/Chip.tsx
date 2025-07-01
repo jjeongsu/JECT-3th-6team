@@ -12,7 +12,6 @@ const chipVariants = cva(
         white: "bg-white text-gray80 border border-gray40",
         main: "bg-main text-white",
         mainLight: "bg-white text-main border border-gray40",
-        disabled: "bg-gray40 text-gray80",
       },
       iconPosition: {
         left: "flex-row",
