@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useDebounce } from '@/shared/lib';
 import { FormValidate } from '@/features/reservation/model/FormValidate';
-import ERROR_CODE_MAP from '@/features/reservation/model/ErrorCodeMap';
+import { ERROR_CODE_MAP } from '@/features/reservation/model/ErrorCodeMap';
 
 type FormType = 'onsite-reservation';
 
@@ -33,7 +33,7 @@ interface UseFormProps<T extends FormType> {
   initialError: FormErrorMap[T];
 }
 
-export default function useForm({
+export default function useForm<T extends FormType>({
   formType,
   initialFormValue,
   initialError,
@@ -51,8 +51,6 @@ export default function useForm({
   ) => {
     switch (field) {
       case 'email':
-        // 여기서 Validator 검증
-        // error message를 리턴
         const validateResult = FormValidate.validateEmail(value as string);
         return ERROR_CODE_MAP[validateResult.errorCode];
 

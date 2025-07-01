@@ -1,4 +1,4 @@
-import ERROR_CODE_MAP from '@/features/reservation/model/ErrorCodeMap';
+import { ERROR_CODE_MAP } from '@/features/reservation/model/ErrorCodeMap';
 
 type ValidateResultType = {
   isValid: boolean;

@@ -32,8 +32,8 @@ export default function OnsiteReservationForm() {
 
   const headcountError =
     formValue.headCount >= MAX_HEAD_COUNT
-      ? ERROR_CODE_MAP[MAX_HEAD_COUNT]
-      : ERROR_CODE_MAP['NONE'];
+      ? ERROR_CODE_MAP.ALERT_MAX_HEADCOUNT
+      : ERROR_CODE_MAP.NONE;
 
   return (
     <div>
