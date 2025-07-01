@@ -1,5 +1,5 @@
-import OnsiteReservationForm from '@/features/reservation/ui/OnsiteReservationForm';
 import PageHeader from '@/shared/ui/header/PageHeader';
+import { OnsiteReservationForm } from '@/features/reservation';
 
 export default function ReservationOnsitePopupPage() {
   return (
