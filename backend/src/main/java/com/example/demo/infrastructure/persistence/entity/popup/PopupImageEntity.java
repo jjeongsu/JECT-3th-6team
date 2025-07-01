@@ -8,9 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
+import lombok.Getter;
+/**
+ * 팝업 이미지 엔티티.
+ * 팝업의 메인 및 설명 이미지를 저장한다.
+ */
 @Entity
 @Table(name = "popup_images")
+@Getter
 public class PopupImageEntity{
 
     @Id

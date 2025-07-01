@@ -1,10 +1,20 @@
 package com.example.demo.infrastructure.persistence.entity.popup;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
 import lombok.Getter;
 
-import java.time.LocalDate;
-
+/**
+ * 팝업 엔티티.
+ * 팝업 기본 정보(제목, 위치, 기간, 타입 등)를 저장한다.
+ */
 @Entity
 @Table(name = "popups")
 @Getter
@@ -19,9 +29,6 @@ public class PopupEntity {
 
     @Column(name = "popup_location_id", nullable = false)
     private Long popupLocationId;
-
-    @Column(name = "slot_interval_minutes", nullable = false)
-    private int slotIntervalMinutes;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)

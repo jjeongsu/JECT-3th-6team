@@ -7,6 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * 팝업 리뷰 이미지 엔티티.
+ * 리뷰에 첨부된 이미지 URL과 정렬 순서를 저장한다.
+ */
 @Entity
 @Table(name = "popup_review_images")
 public class PopupReviewImageEntity {
