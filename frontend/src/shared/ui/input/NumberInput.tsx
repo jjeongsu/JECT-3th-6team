@@ -72,7 +72,7 @@ export default function NumberInput({
         </div>
       </div>
       {errorMessage && (
-        <span className={'font-regular text-xs text-red'}>{errorMessage}</span>
+        <span className={'font-regular text-xs text-red'}>*{errorMessage}</span>
       )}
     </div>
   );
