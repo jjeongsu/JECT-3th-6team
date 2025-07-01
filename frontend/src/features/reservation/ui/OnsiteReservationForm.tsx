@@ -9,6 +9,11 @@ import {
 import useForm from '../hook/useForm';
 import Image from 'next/image';
 import ReloadIcon from '/public/icons/Normal/Icon_Reload.svg';
+import {
+  ERROR_CODE_MAP,
+  MAX_HEAD_COUNT,
+  MIN_HEAD_COUNT,
+} from '@/features/reservation/model/ErrorCodeMap';
 
 export default function OnsiteReservationForm() {
   const { formValue, error, handleChange, handleReset } = useForm({
@@ -24,8 +29,12 @@ export default function OnsiteReservationForm() {
       email: '',
     },
   });
+
   const headcountError =
-    formValue.headCount >= 6 ? '최대 6명까지 가능합니다' : '';
+    formValue.headCount >= MAX_HEAD_COUNT
+      ? ERROR_CODE_MAP[MAX_HEAD_COUNT]
+      : ERROR_CODE_MAP['NONE'];
+
   return (
     <div>
       <div className={'px-5 flex flex-col gap-y-11.5 mt-4'}>
@@ -42,10 +51,10 @@ export default function OnsiteReservationForm() {
         <NumberInput
           label={'대기자 수'}
           value={formValue.headCount}
-          max={6}
-          min={1}
+          max={MAX_HEAD_COUNT}
+          min={MIN_HEAD_COUNT}
           onChange={(value: number) => handleChange('headCount', value)}
-          errorMessage={headcountError} // 여기는 따로 처리
+          errorMessage={headcountError}
         />
 
         <TextInput
