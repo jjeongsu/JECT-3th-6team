@@ -1,11 +1,12 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
+import Image from "next/image"
 
 import { cn } from "@/lib/utils"
 
 const chipVariants = cva(
-  "inline-flex items-start justify-center rounded-full px-3 py-2 text-xs font-medium w-fit whitespace-nowrap shrink-0 gap-2.5 focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  "inline-flex justify-center rounded-full px-3 py-2 text-xs font-medium w-fit whitespace-nowrap shrink-0 gap-2.5 focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
   {
     variants: {
       variant: {
@@ -45,20 +46,29 @@ function Chip({
 }: ChipProps) {
   const Comp = asChild ? Slot : "span"
 
+  // iconPosition이 "right"이고 icon이 제공되지 않았을 때 기본 X 아이콘 사용
+  const defaultIcon = iconPosition === "right" && !icon ? (
+    <Image
+      src="/icons/Normal/Icon_X.svg"
+      alt="Close"
+      width={12}
+      height={12}
+      className="size-3"
+    />
+  ) : icon
+
   return (
     <Comp
       data-slot="chip"
       className={cn(chipVariants({ variant, iconPosition }), className)}
       {...props}
     >
-      {icon && iconPosition !== "none" && (
+      {defaultIcon && iconPosition !== "none" && (
         <span className="flex items-center justify-center [&>svg]:size-3 [&>svg]:pointer-events-none">
-          {icon}
+          {defaultIcon}
         </span>
       )}
-      <span className="flex flex-col items-start gap-2.5">
-        {children}
-      </span>
+      {children}
     </Comp>
   )
 }
