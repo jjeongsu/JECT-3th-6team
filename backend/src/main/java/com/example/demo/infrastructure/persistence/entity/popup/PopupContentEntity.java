@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+/**
+ * 팝업 설명 콘텐츠 엔티티.
+ * 팝업 상세 설명 텍스트 및 정렬 순서를 저장한다.
+ */
 @Entity
 @Table(name = "popup_contents")
+@Getter
 public class PopupContentEntity{
 
     @Id
