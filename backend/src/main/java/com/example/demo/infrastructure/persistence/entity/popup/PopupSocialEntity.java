@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+/**
+ * 팝업 소셜 링크 엔티티.
+ * 팝업과 연결된 SNS 아이콘 URL 및 링크 URL 정보를 저장한다.
+ */
 @Entity
 @Table(name = "popup_socials")
+@Getter
 public class PopupSocialEntity {
 
     @Id

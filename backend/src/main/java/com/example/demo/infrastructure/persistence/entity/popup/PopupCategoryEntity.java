@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+/**
+ * 팝업 카테고리 매핑 엔티티.
+ * 팝업과 카테고리의 관계 및 이름 정보를 저장한다.
+ */
 @Entity
 @Table(name = "popup_categories")
+@Getter
 public class PopupCategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

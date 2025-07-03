@@ -21,17 +21,15 @@ export function BadgeExample() {
       <div className="space-y-2">
         <h3 className="text-sm font-medium">1. 아이콘이 없고 텍스트만 있는 경우</h3>
         <div className="flex gap-2">
-          <Badge variant="main">메인</Badge>
-          <Badge variant="gray">그레이</Badge>
+          <Badge variant="main">예약중</Badge>
+          <Badge variant="gray">방문 완료</Badge>
         </div>
       </div>
 
       <div className="space-y-2">
         <h3 className="text-sm font-medium">2. 아이콘이 좌측에 있는 경우</h3>
         <div className="flex gap-2">
-          <Badge icon={<StarIcon />} iconPosition="left" variant="main">좋아요</Badge>
-          <Badge icon={<StarIcon />} iconPosition="left" variant="gray">추천</Badge>
-          <Badge icon={<HeartIcon />} iconPosition="left" variant="main">즐겨찾기</Badge>
+          <Badge icon={<StarIcon />} iconPosition="left" variant="main">10일 남음</Badge>
         </div>
       </div>
     </div>

@@ -6,9 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
+/**
+ * 팝업 위치 엔티티.
+ * 팝업의 주소 및 좌표 정보를 저장한다.
+ */
 @Entity
 @Table(name = "popup_locations")
+@Getter
 public class PopupLocationEntity {
 
     @Id

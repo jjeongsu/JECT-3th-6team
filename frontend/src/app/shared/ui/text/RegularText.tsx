@@ -8,7 +8,7 @@ export function RegularText({
 }: TextProps) {
   return (
     <p 
-      className={`text-[14px] font-normal text-[var(--color-text-color)] font-pretendard leading-normal ${className}`}
+      className={`text-[14px] font-normal text-text-color leading-normal ${className}`}
       onClick={onClick}
       {...props}
     >

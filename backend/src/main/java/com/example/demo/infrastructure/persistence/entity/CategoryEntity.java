@@ -8,6 +8,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 
+/**
+ * 카테고리 엔티티.
+ * 카테고리 기본 정보를 저장한다.
+ */
 @Entity
 @Table(name = "categories")
 public class CategoryEntity {
