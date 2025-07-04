@@ -12,9 +12,10 @@ import {
 interface ImageCarouselProps {
   images: string[]
   altText?: string
+  className?: string
 }
 
-export function ImageCarousel({ images, altText }: ImageCarouselProps) {
+export function ImageCarousel({ images, altText, className }: ImageCarouselProps) {
   // altText가 없거나 빈 문자열인 경우 기본값 사용
   const defaultAltText = altText || "팝업 스토어 이미지"
   const [api, setApi] = useState<CarouselApi>()
@@ -38,7 +39,7 @@ export function ImageCarousel({ images, altText }: ImageCarouselProps) {
         <CarouselContent>
           {images.map((image, index) => (
             <CarouselItem key={index}>
-              <div className="relative w-full h-[300px] overflow-hidden">
+              <div className={`relative w-full h-[300px] overflow-hidden ${className || ""}`}>
                 <Image
                   src={image}
                   alt={`${defaultAltText} ${index + 1}`}
