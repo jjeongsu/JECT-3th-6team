@@ -3,12 +3,15 @@
 import React from "react"
 import { ChevronRight, MapPin, Star, Clock } from "lucide-react"
 
-import { Badge } from "../../shared/ui/badge/Badge"
-import { Tag } from "../../shared/ui/tag/Tag"
+import { Badge } from "@/shared/ui/badge/Badge"
+import { Tag } from "@/shared/ui/tag/Tag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DescriptionTab } from "./DescriptionTab"
-import { ReviewTab } from "./ReviewTab"
-import { ImageCarousel } from "../features/ui/ImageCarousel"
+import { DescriptionTab } from "@/app/features/detail/ui/DescriptionTab"
+import { ReviewTab } from "@/app/features/detail/ui/ReviewTab"
+import { ImageCarousel } from "@/app/features/detail/ui/ImageCarousel"
+import { SemiBoldText } from "@/shared/ui/text/SemiBoldText"
+import { MediumText } from "@/shared/ui/text/MediumText"
+import Image from "next/image"
 
 export default function ProductDetail() {
   const images = ["/images/sunglass.jpg", "/images/sunglass.jpg", "/images/sunglass.jpg"]
@@ -19,36 +22,37 @@ export default function ProductDetail() {
       <ImageCarousel images={images} />
 
       {/* Main Detail */}
-      <div className="p-4"> 
+      <div className="py-6 px-5"> 
         {/* Badge and Rating */}
-        <div className="flex items-center justify-between mb-4">
-          <Badge className="bg-orange-500 hover:bg-orange-600 text-white">
-            <Clock className="w-3 h-3 mr-1" />
+        <div className="flex items-center justify-between">
+          <Badge iconPosition="left">
             10일 남음
           </Badge>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 fill-orange-400 text-orange-400" />
-            <span className="text-sm font-medium">4</span>
-            <span className="text-sm text-gray-500">(25개의 리뷰)</span>
+          <div className="flex items-center gap-1"> 
+            <Image
+              src="/icons/Normal/Icon_Star.svg"
+              alt="star"
+              width={18}
+              height={17}
+              className="w-4.5 h-4.5 fill-main"
+            />
+            <MediumText color="text-gray80">4.5</MediumText>
+            <MediumText color="text-gray80">(25개의 리뷰)</MediumText>
           </div>
         </div>
-
-        {/* Title */}
-        <p className={`text-[24px] font-normal text-[var(--color-text-color)] font-pretendard leading-normal`}>젠틀몬스터</p>
-
-        {/* Hashtags */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Tag>수도권</Tag>
-          <Tag>체험형</Tag>
-          <Tag>패션</Tag>
-          <Tag>뷰티</Tag>
+        {/* Title and Tags*/}
+        <div >
+          <SemiBoldText size="lg">젠틀몬스터</SemiBoldText>
+            <Tag>수도권</Tag>
+            <Tag>체험형</Tag>
+            <Tag>패션</Tag>
+            <Tag>뷰티</Tag>          
         </div>
-
         {/* Location */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MapPin className="w-4 h-4 text-gray-600" />
-            <span className="text-sm text-gray-700">서울, 용산구 한남동 61-2</span>
+            <MediumText>서울, 용산구 한남동 61-2</MediumText>
           </div>
           <ChevronRight className="w-4 h-4 text-gray-400" />
         </div>
@@ -74,7 +78,6 @@ export default function ProductDetail() {
         <DescriptionTab />
         <ReviewTab />
       </Tabs>
-
     </div>
   )
 }

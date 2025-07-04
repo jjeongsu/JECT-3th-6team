@@ -33,7 +33,7 @@ export function ImageCarousel({ images, altText }: ImageCarouselProps) {
   }, [api])
 
   return (
-    <div className="relative mb-6">
+    <div className="relative">
       <Carousel setApi={setApi} className="w-full">
         <CarouselContent>
           {images.map((image, index) => (

@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star } from "lucide-react"
-import { ReviewTab } from "./ReviewTab"
+import { ReviewTab } from "@/app/features/detail/ui/ReviewTab"
+
 export function DescriptionTab() {
   return (
     <TabsContent value="description" className="px-5 py-6">
