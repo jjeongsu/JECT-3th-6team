@@ -1,6 +1,5 @@
 package com.example.demo.application.service;
 
-import com.example.demo.application.dto.WaitingRequest;
 import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;

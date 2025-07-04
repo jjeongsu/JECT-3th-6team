@@ -1,6 +1,5 @@
 package com.example.demo.presentation.controller;
 
-import com.example.demo.application.dto.WaitingRequest;
 import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.VisitHistoryCursorResponse;
@@ -25,7 +24,7 @@ public class WaitingController {
     @PostMapping("/popups/{popupId}/waitings")
     public ResponseEntity<Map<String, Object>> createWaiting(
             @PathVariable Long popupId,
-            @RequestBody WaitingRequest request
+            @RequestBody WaitingCreateRequest request
     ) {
         WaitingCreateRequest createRequest = new WaitingCreateRequest(
                 popupId,
