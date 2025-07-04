@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useDebounce } from '@/shared/lib';
 import { FormValidate } from '@/features/reservation/model/FormValidate';
 import { ERROR_CODE_MAP } from '@/features/reservation/model/ErrorCodeMap';
+import { DEBOUNCE_DELAY_MS } from '@/shared/constant';
 
 type FormType = 'onsite-reservation';
 
@@ -60,7 +61,7 @@ export default function useForm<T extends FormType>({
     }
   };
 
-  const debouncedValue = useDebounce(currentValue, 400);
+  const debouncedValue = useDebounce(currentValue, DEBOUNCE_DELAY_MS.formInput);
 
   useEffect(() => {
     if (currentField && debouncedValue) {

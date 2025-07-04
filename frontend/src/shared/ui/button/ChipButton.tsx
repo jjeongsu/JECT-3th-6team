@@ -15,7 +15,7 @@ export default function ChipButton({
 }: ChipButtonProps) {
   const buttonStyle = isChecked
     ? 'bg-main text-white'
-    : 'bg-white border border-gray20 text-gray60';
+    : 'bg-white border border-gray40 text-gray60';
   return (
     <button
       type="button"
