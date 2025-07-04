@@ -71,10 +71,12 @@ export function DescriptionTab() {
           <p className="text-sm text-gray-600 mt-2">✅ 라커디움파크</p>
           <p className="text-sm text-gray-600">KBO, 팀코리아 등 야구팬을 위한 굿즈 아이템을 만나보세요</p>
           <p className="text-sm text-gray-600">✅ 라커디움파크</p>
-          <p className="text-sm text-gray-600">①응원하는 KBO팀 투표시 야구공 증정 이벤트 (매장내 비치된 투표보드지에 응원하는 KBO팀 투표, 매장 인스타그램 팔로우시 야구공 증정 (1인1회 한정))
+          <p className="text-sm text-gray-600">①응원하는 KBO팀 투표시 야구공 증정 이벤트 (매장내 비치된 투표보드지에 응원하는 KBO팀 투표, 매장 인스타그램 팔로우시 야구공 증정 (1인1회 한정))
           ②스포츠일러스트레이티드 x 몽베스트 콜라보레이션 상품 구매시 스페셜기프트 및 전용패키징 증정 (한정수량)</p>
         </div>
+        <div className="border-t border-gray40 mt-4 -mx-5"></div>
       </div>
+    
     </TabsContent>
   )
 }
