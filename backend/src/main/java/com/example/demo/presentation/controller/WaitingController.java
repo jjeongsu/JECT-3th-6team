@@ -29,9 +29,10 @@ public class WaitingController {
     ) {
         WaitingCreateRequest createRequest = new WaitingCreateRequest(
                 popupId,
+                request.memberId(),
                 request.name(),
                 request.peopleCount(),
-                request.email()
+                request.contactEmail()
         );
         WaitingCreateResponse response = waitingService.createWaiting(createRequest);
         

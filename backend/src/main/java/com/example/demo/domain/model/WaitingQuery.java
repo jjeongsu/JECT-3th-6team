@@ -1,0 +1,48 @@
+package com.example.demo.domain.model;
+
+import java.util.Optional;
+
+/**
+ * 대기 조회 조건을 표현하는 클래스.
+ * 커서 기반 페이지네이션과 필터링 조건을 포함한다.
+ */
+public record WaitingQuery(
+    Long memberId,
+    Integer size,
+    Long lastWaitingId,
+    WaitingStatus status
+) {
+    
+    /**
+     * 첫 페이지 조회용 생성자
+     */
+    public static WaitingQuery firstPage(Long memberId, Integer size) {
+        return new WaitingQuery(memberId, size, null, null);
+    }
+    
+    /**
+     * 상태 필터링이 포함된 조회용 생성자
+     */
+    public static WaitingQuery withStatus(Long memberId, Integer size, WaitingStatus status) {
+        return new WaitingQuery(memberId, size, null, status);
+    }
+    
+    /**
+     * 방문 내역 조회를 위한 조회 조건을 생성한다.
+     * 
+     * @param memberId 회원 ID
+     * @param size 조회할 개수
+     * @param lastWaitingId 마지막 대기 ID (첫 페이지 조회 시 null)
+     * @param status 상태 문자열 (필터링 시 사용, null이면 전체 조회)
+     * @return WaitingQuery 객체
+     * @throws IllegalArgumentException 유효하지 않은 상태인 경우
+     */
+    public static WaitingQuery forVisitHistory(Long memberId, Integer size, Long lastWaitingId, String status) {
+        return Optional.ofNullable(lastWaitingId)
+                .map(id -> new WaitingQuery(memberId, size, id, WaitingStatus.fromString(status)))
+                .orElseGet(() -> Optional.ofNullable(WaitingStatus.fromString(status))
+                        .map(waitingStatus -> withStatus(memberId, size, waitingStatus))
+                        .orElse(firstPage(memberId, size))
+                );
+    }
+} 
