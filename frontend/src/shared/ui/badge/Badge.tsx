@@ -11,7 +11,7 @@ export const badgeVariants = cva(
     variants: {
       variant: {
         main: "bg-main",
-        gray: "bg-[var(--color-gray80)]",
+        gray: "bg-gray80",
       },
     },
     defaultVariants: {
