@@ -11,5 +11,14 @@
  *   <li>도메인 모델을 직접 노출하지 않고 안전한 데이터 전송</li>
  *   <li>API 요청/응답 데이터 구조 정의</li>
  * </ul>
+ * 
+ * <h3>DTO 작성 규칙</h3>
+ * <ul>
+ *   <li>요청에 사용되는 DTO는 ~Request, 응답에 사용되는 DTO는 ~Response로 이름을 붙인다.</li>
+ *   <li>DTO는 Record 클래스를 사용한다.</li>
+ *   <li>DTO에는 별도의 빌더 패턴 등을 지양한다.</li>
+ *   <li>DTO 클래스명에는 "Dto"라는 단어를 포함하지 않는다.</li>
+ *   <li>커서 기반 페이지네이션 응답은 ~CursorResponse로 명명한다.</li>
+ * </ul>
  */
 package com.example.demo.application.dto; 
