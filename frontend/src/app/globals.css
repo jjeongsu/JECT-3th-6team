@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import url('https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduPower/GangwonEduPower.css');
 @import "tw-animate-css";
-/*---break---*/
+
 @custom-variant dark (&:is(.dark *));
 
 @font-face {
@@ -15,12 +15,9 @@
   url('https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduPower/GangwonEduPower.ttf') format('truetype');
 }
 
-@font-face {
-  font-family: 'Pretendard';
-  font-weight: 400;
-  font-style: normal;
-  font-display: fallback;
-  src: url('/fonts/PretendardVariable.woff2') format('woff2-variations');
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
 }
 
 @theme {
@@ -42,22 +39,20 @@
   /*other-color*/
   --color-red: rgba(255, 89, 89, 1);
 
-  /*text-colors*/
-  --color-text-color: #545454;
-  --color-text-gray-color: #8B95A1;
-
   /*ganwon-font*/
   --font-gangwon: 'GangwonEdu Power', sans-serif;
-
-  /*pretendard-font*/
-  --font-pretendard: 'Pretendard', sans-serif;
 
   /*shadow*/
   --shadow-button: 0px 2px 10px 0px rgba(152, 74, 0, 0.15);
   --shadow-calendar: 0px 1px 2px 0px rgba(0, 0, 0, 0.04);
+  --shadow-container: 0px -4px 20px 0px rgba(0, 0, 0, 0.05);
+
+  /*text-colors*/
+  --color-text-color: #545454;
+  --color-text-gray-color: #8B95A1;
+
 }
 
-/*---break---*/
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
@@ -133,7 +128,6 @@
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
 }
-
 /*---break---*/
 
 .dark {
@@ -179,4 +173,17 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
 }
