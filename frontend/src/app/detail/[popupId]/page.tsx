@@ -41,7 +41,7 @@ export default function ProductDetail() {
           </div>
         </div>
         {/* Title and Tags*/}
-        <div >
+        <div className="mt-6">
           <SemiBoldText size="lg">젠틀몬스터</SemiBoldText>
             <Tag>수도권</Tag>
             <Tag>체험형</Tag>
@@ -49,32 +49,38 @@ export default function ProductDetail() {
             <Tag>뷰티</Tag>          
         </div>
         {/* Location */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-gray-600" />
+        <div className="flex items-center justify-between mt-2.5">
+          <div className="flex items-center">
+            <Image
+              src="/icons/Normal/Icon_map.svg"
+              alt="map"
+              width={22}
+              height={22}
+              className="w-5.5 h-5.5 mr-1"
+            />
             <MediumText>서울, 용산구 한남동 61-2</MediumText>
           </div>
-          <ChevronRight className="w-4 h-4 text-gray-400" />
+          {/* 없어도 무관한 화살표 */}
+          {/* <ChevronRight className="w-4 h-4 text-gray-400" /> */}
         </div>
       </div>
 
       {/* Tabs */}
       <Tabs defaultValue="description" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-transparent border-b rounded-none h-auto p-0">
+        <TabsList className="grid w-full grid-cols-2 bg-transparent border-b-2 border-sub rounded-none h-auto p-0">
           <TabsTrigger
             value="description"
-            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:text-black rounded-none pb-3 pt-4 text-base font-medium"
+            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-4 data-[state=active]:border-main data-[state=active]:text-black data-[state=active]:-mb-1 rounded-none pb-3 pt-4 text-base font-medium"
           >
             팝업 설명
           </TabsTrigger>
           <TabsTrigger
             value="reviews"
-            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-2 data-[state=active]:border-orange-500 data-[state=active]:text-black rounded-none pb-3 pt-4 text-base font-medium"
+            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-4 data-[state=active]:border-main data-[state=active]:text-black data-[state=active]:-mb-1 rounded-none pb-3 pt-4 text-base font-medium"
           >
             리뷰
           </TabsTrigger>
         </TabsList>
-
         <DescriptionTab />
         <ReviewTab />
       </Tabs>
