@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
       <html lang="kr" className={`${pretendard.variable}`}>
       <body className={`${pretendard.className} `}>
-        <div className="min-h-screen bg-[var(--color-gray40)]">
+        <div className="min-h-screen bg-gray40">
           <div className="w-full min-w-[320px] max-w-[430px] mx-auto bg-white min-h-screen">
             {/* <Header /> */}
             

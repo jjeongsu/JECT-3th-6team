@@ -66,17 +66,17 @@ export default function ProductDetail() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="description" className="w-full">
+      <Tabs defaultValue="description" className="w-full gap-0">
         <TabsList className="grid w-full grid-cols-2 bg-transparent border-b-2 border-sub rounded-none h-auto p-0">
           <TabsTrigger
             value="description"
-            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-4 data-[state=active]:border-main data-[state=active]:text-black data-[state=active]:-mb-1 rounded-none pb-3 pt-4 text-base font-medium"
+            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-4 data-[state=active]:border-main data-[state=active]:text-black data-[state=active]:-mb-1 rounded-none pb-3 py-4 text-base font-medium"
           >
             팝업 설명
           </TabsTrigger>
           <TabsTrigger
             value="reviews"
-            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-4 data-[state=active]:border-main data-[state=active]:text-black data-[state=active]:-mb-1 rounded-none pb-3 pt-4 text-base font-medium"
+            className="data-[state=active]:bg-transparent data-[state=active]:shadow-none border-0 data-[state=active]:border-0 data-[state=active]:border-b-4 data-[state=active]:border-main data-[state=active]:text-black data-[state=active]:-mb-1 rounded-none pb-3 py-4 text-base font-medium"
           >
             리뷰
           </TabsTrigger>
