@@ -1,7 +1,5 @@
 package com.example.demo.infrastructure.persistence.adapter;
 
-import com.example.demo.domain.model.Member;
-import com.example.demo.domain.model.PopupDetail;
 import com.example.demo.domain.model.Waiting;
 import com.example.demo.domain.model.WaitingQuery;
 import com.example.demo.domain.port.WaitingRepository;
@@ -9,9 +7,7 @@ import com.example.demo.infrastructure.persistence.entity.WaitingEntity;
 import com.example.demo.infrastructure.persistence.mapper.WaitingMapper;
 import com.example.demo.infrastructure.persistence.repository.WaitingJpaRepository;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 /**

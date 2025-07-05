@@ -1,6 +1,5 @@
 package com.example.demo.infrastructure.persistence.repository;
 
-import com.example.demo.domain.model.WaitingStatus;
 import com.example.demo.infrastructure.persistence.entity.WaitingEntity;
 import java.util.List;
 import java.util.Optional;
