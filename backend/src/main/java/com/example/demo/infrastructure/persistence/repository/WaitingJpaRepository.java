@@ -1,5 +1,6 @@
 package com.example.demo.infrastructure.persistence.repository;
 
+import com.example.demo.domain.model.WaitingStatus;
 import com.example.demo.infrastructure.persistence.entity.WaitingEntity;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +35,12 @@ public interface WaitingJpaRepository extends JpaRepository<WaitingEntity, Long>
      * @return 대기 엔티티 목록
      */
     @Query("SELECT w FROM WaitingEntity w WHERE w.memberId = :memberId ORDER BY " +
-           "CASE WHEN w.status = 'RESERVED' THEN 0 ELSE 1 END, " +
+           "CASE WHEN w.status = :reservedStatus THEN 0 ELSE 1 END, " +
            "w.createdAt DESC")
     List<WaitingEntity> findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(
-            @Param("memberId") Long memberId, Pageable pageable);
+            @Param("memberId") Long memberId, 
+            @Param("reservedStatus") WaitingStatus reservedStatus, 
+            Pageable pageable);
     
     /**
      * 팝업 ID로 최대 대기 번호를 조회한다.

@@ -2,6 +2,7 @@ package com.example.demo.infrastructure.persistence.adapter;
 
 import com.example.demo.domain.model.Waiting;
 import com.example.demo.domain.model.WaitingQuery;
+import com.example.demo.domain.model.WaitingStatus;
 import com.example.demo.domain.port.WaitingRepository;
 import com.example.demo.infrastructure.persistence.entity.WaitingEntity;
 import com.example.demo.infrastructure.persistence.mapper.WaitingMapper;
@@ -45,7 +46,7 @@ public class WaitingRepositoryAdapter implements WaitingRepository {
         switch (query.sortOrder()) {
             case RESERVED_FIRST_THEN_DATE_DESC:
                 entities = waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(
-                        query.memberId(), PageRequest.of(0, query.size()));
+                        query.memberId(), WaitingStatus.RESERVED, PageRequest.of(0, query.size()));
                 break;
             case DATE_DESC:
                 entities = waitingJpaRepository.findByMemberIdOrderByCreatedAtDesc(
@@ -54,7 +55,7 @@ public class WaitingRepositoryAdapter implements WaitingRepository {
             default:
                 // 기본값은 RESERVED_FIRST_THEN_DATE_DESC
                 entities = waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(
-                        query.memberId(), PageRequest.of(0, query.size()));
+                        query.memberId(), WaitingStatus.RESERVED, PageRequest.of(0, query.size()));
         }
         
         return entities.stream()
