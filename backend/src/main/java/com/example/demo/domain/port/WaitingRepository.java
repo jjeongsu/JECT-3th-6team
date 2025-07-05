@@ -15,7 +15,7 @@ public interface WaitingRepository {
      * 대기 정보를 저장한다.
      * 
      * @param waiting 저장할 대기 정보
-     * @return 저장된 대기 정보
+     * @return 저장된 대기 정보ㅇ
      */
     Waiting save(Waiting waiting);
     
