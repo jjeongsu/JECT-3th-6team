@@ -18,9 +18,6 @@ import com.example.demo.domain.model.PopupDetailInfo;
 import com.example.demo.domain.model.Rating;
 import com.example.demo.domain.model.SearchTags;
 import com.example.demo.domain.model.Sns;
-import java.time.DayOfWeek;
-import java.time.format.TextStyle;
-import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -95,17 +92,8 @@ public class PopupDetailMapper {
     }
     private DayOfWeekInfoDto toDayOfWeekInfoDto(DayOfWeekInfo d) {
         return new DayOfWeekInfoDto(
-            abbreviateDayOfWeek(d.dayOfWeek()),
+            d.dayOfWeek(),
             d.value()
         );
-    }
-
-    private String abbreviateDayOfWeek(String fullName) {
-        try {
-            DayOfWeek dow = DayOfWeek.valueOf(fullName.toUpperCase());
-            return dow.getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase();
-        } catch (IllegalArgumentException e) {
-            return fullName;
-        }
     }
 }
