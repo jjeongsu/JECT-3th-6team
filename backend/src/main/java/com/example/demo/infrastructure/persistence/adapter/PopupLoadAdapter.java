@@ -1,6 +1,5 @@
 package com.example.demo.infrastructure.persistence.adapter;
 
-import com.example.demo.application.mapper.PopupDetailMapper;
 import com.example.demo.domain.model.BrandStory;
 import com.example.demo.domain.model.DayOfWeekInfo;
 import com.example.demo.domain.model.Location;
@@ -9,14 +8,11 @@ import com.example.demo.domain.model.PopupDetail;
 import com.example.demo.domain.model.PopupDetailInfo;
 import com.example.demo.domain.model.Rating;
 import com.example.demo.domain.model.SearchTags;
-import com.example.demo.domain.model.Sns;
 import com.example.demo.domain.port.PopupLoadPort;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupCategoryEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupContentEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupImageEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupImageType;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupLocationEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupReviewEntity;
+import com.example.demo.infrastructure.persistence.mapper.PopupMapper;
 import com.example.demo.infrastructure.persistence.repository.PopupCategoryRepository;
 import com.example.demo.infrastructure.persistence.repository.PopupContentRepository;
 import com.example.demo.infrastructure.persistence.repository.PopupImageRepository;
@@ -42,8 +38,8 @@ public class PopupLoadAdapter implements PopupLoadPort {
     private final PopupReviewRepository popupReviewRepository;
     private final PopupSocialRepository popupSocialRepository;
     private final PopupWeeklyScheduleRepository popupWeeklyScheduleRepository;
-    private final PopupDetailMapper popupDetailMapper;
     private final PopupRepository popupRepository;
+    private final PopupMapper popupMapper;
 
     @Override
     public Optional<PopupDetail> findDetailById(Long popupId) {
@@ -54,50 +50,31 @@ public class PopupLoadAdapter implements PopupLoadPort {
                 .map(PopupImageEntity::getUrl)
                 .toList();
 
-            List<Integer> ratingValues = popupReviewRepository.findAllByPopupId(popupId)
-                .stream()
-                .map(PopupReviewEntity::getRating)
-                .toList();
-            Rating rating = Rating.from(ratingValues);
+            Rating rating = popupMapper.toRating(
+                popupReviewRepository.findAllByPopupId(popupId)
+            );
 
-            List<String> categories = popupCategoryRepository.findAllByPopupId(popupId)
-                .stream()
-                .map(PopupCategoryEntity::getName)
-                .toList();
-            SearchTags searchTags = new SearchTags(popup.getType().name(), categories);
+            SearchTags searchTags = popupMapper.toSearchTags(
+                popup.getType().name(),
+                popupCategoryRepository.findAllByPopupId(popupId)
+            );
 
-            PopupLocationEntity loc = popupLocationRepository.findById(popup.getPopupLocationId())
-                .orElseThrow(() -> new IllegalStateException("존재하지 않는 팝업 위치입니다."));
-            Location location = new Location(
-                loc.getAddressName(),
-                loc.getRegion1DepthName(),
-                loc.getRegion2DepthName(),
-                loc.getRegion3DepthName() != null ? loc.getRegion3DepthName() : "",
-                loc.getLongitude(),
-                loc.getLatitude()
+            Location location = popupMapper.toLocation(
+                popupLocationRepository.findById(popup.getPopupLocationId())
+                    .orElseThrow(() -> new IllegalStateException("존재하지 않는 팝업 위치입니다."))
             );
 
             Period period = new Period(popup.getStartDate(), popup.getEndDate());
             int dDay = (int) ChronoUnit.DAYS.between(LocalDate.now(), popup.getEndDate());
 
-            List<String> brandImages = popupImageRepository.findAllByPopupIdAndTypeOrderBySortOrderAsc(popupId, PopupImageType.DESCRIPTION)
-                .stream()
-                .map(PopupImageEntity::getUrl)
-                .toList();
+            BrandStory brandStory = popupMapper.toBrandStory(
+                popupImageRepository.findAllByPopupIdAndTypeOrderBySortOrderAsc(popupId, PopupImageType.DESCRIPTION),
+                popupSocialRepository.findAllByPopupIdOrderBySortOrderAsc(popupId)
+            );
 
-            List<Sns> snsList = popupSocialRepository.findAllByPopupIdOrderBySortOrderAsc(popupId)
-                .stream()
-                .map(s -> new Sns(s.getIconUrl(), s.getLinkUrl()))
-                .toList();
-            BrandStory brandStory = new BrandStory(brandImages, snsList);
-
-            List<DayOfWeekInfo> dayOfWeeks = popupWeeklyScheduleRepository.findAllByPopupId(popupId)
-                .stream()
-                .map(s -> new DayOfWeekInfo(
-                    s.getDayOfWeek().name(),
-                    s.getOpenTime() + " ~ " + s.getCloseTime()
-                ))
-                .toList();
+            List<DayOfWeekInfo> dayOfWeeks = popupMapper.toDayOfWeekInfos(
+                popupWeeklyScheduleRepository.findAllByPopupId(popupId)
+            );
 
             List<String> descriptions = popupContentRepository.findAllByPopupIdOrderBySortOrderAsc(popupId)
                 .stream()
@@ -120,5 +97,4 @@ public class PopupLoadAdapter implements PopupLoadPort {
             );
         });
     }
-
 }
