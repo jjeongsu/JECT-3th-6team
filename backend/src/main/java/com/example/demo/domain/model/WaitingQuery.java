@@ -10,21 +10,37 @@ public record WaitingQuery(
     Long memberId,
     Integer size,
     Long lastWaitingId,
-    WaitingStatus status
+    WaitingStatus status,
+    SortOrder sortOrder
 ) {
     
     /**
-     * 첫 페이지 조회용 생성자
+     * 정렬 순서를 정의하는 enum
      */
-    public static WaitingQuery firstPage(Long memberId, Integer size) {
-        return new WaitingQuery(memberId, size, null, null);
+    public enum SortOrder {
+        /**
+         * RESERVED 상태가 먼저, 그 다음 날짜 최신순
+         */
+        RESERVED_FIRST_THEN_DATE_DESC,
+        
+        /**
+         * 날짜 최신순
+         */
+        DATE_DESC
     }
     
     /**
-     * 상태 필터링이 포함된 조회용 생성자
+     * 첫 페이지 조회용 생성자 (기본 정렬: RESERVED_FIRST_THEN_DATE_DESC)
+     */
+    public static WaitingQuery firstPage(Long memberId, Integer size) {
+        return new WaitingQuery(memberId, size, null, null, SortOrder.RESERVED_FIRST_THEN_DATE_DESC);
+    }
+    
+    /**
+     * 상태 필터링이 포함된 조회용 생성자 (기본 정렬: RESERVED_FIRST_THEN_DATE_DESC)
      */
     public static WaitingQuery withStatus(Long memberId, Integer size, WaitingStatus status) {
-        return new WaitingQuery(memberId, size, null, status);
+        return new WaitingQuery(memberId, size, null, status, SortOrder.RESERVED_FIRST_THEN_DATE_DESC);
     }
     
     /**
@@ -39,10 +55,24 @@ public record WaitingQuery(
      */
     public static WaitingQuery forVisitHistory(Long memberId, Integer size, Long lastWaitingId, String status) {
         return Optional.ofNullable(lastWaitingId)
-                .map(id -> new WaitingQuery(memberId, size, id, WaitingStatus.fromString(status)))
+                .map(id -> new WaitingQuery(memberId, size, id, WaitingStatus.fromString(status), SortOrder.RESERVED_FIRST_THEN_DATE_DESC))
                 .orElseGet(() -> Optional.ofNullable(WaitingStatus.fromString(status))
                         .map(waitingStatus -> withStatus(memberId, size, waitingStatus))
                         .orElse(firstPage(memberId, size))
                 );
+    }
+    
+    /**
+     * 정렬 순서를 지정한 조회 조건을 생성한다.
+     * 
+     * @param memberId 회원 ID
+     * @param size 조회할 개수
+     * @param lastWaitingId 마지막 대기 ID (첫 페이지 조회 시 null)
+     * @param status 상태 (필터링 시 사용, null이면 전체 조회)
+     * @param sortOrder 정렬 순서
+     * @return WaitingQuery 객체
+     */
+    public static WaitingQuery withSortOrder(Long memberId, Integer size, Long lastWaitingId, WaitingStatus status, SortOrder sortOrder) {
+        return new WaitingQuery(memberId, size, lastWaitingId, status, sortOrder);
     }
 } 

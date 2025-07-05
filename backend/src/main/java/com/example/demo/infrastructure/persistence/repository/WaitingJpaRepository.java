@@ -15,19 +15,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface WaitingJpaRepository extends JpaRepository<WaitingEntity, Long> {
-    
-    /**
-     * 팝업 ID와 상태로 대기 목록을 조회한다.
-     * 생성일 기준 내림차순으로 정렬한다.
-     * 
-     * @param popupId 팝업 ID
-     * @param status 대기 상태
-     * @param pageable 페이징 정보
-     * @return 대기 엔티티 목록
-     */
-    List<WaitingEntity> findByPopupIdAndStatusOrderByCreatedAtDesc(
-            Long popupId, WaitingStatus status, Pageable pageable);
-    
+
     /**
      * 회원 ID로 대기 목록을 조회한다.
      * 생성일 기준 내림차순으로 정렬한다.
@@ -37,6 +25,20 @@ public interface WaitingJpaRepository extends JpaRepository<WaitingEntity, Long>
      * @return 대기 엔티티 목록
      */
     List<WaitingEntity> findByMemberIdOrderByCreatedAtDesc(Long memberId, Pageable pageable);
+    
+    /**
+     * 회원 ID로 대기 목록을 조회한다.
+     * RESERVED 상태가 먼저, 그 다음 생성일 기준 내림차순으로 정렬한다.
+     * 
+     * @param memberId 회원 ID
+     * @param pageable 페이징 정보
+     * @return 대기 엔티티 목록
+     */
+    @Query("SELECT w FROM WaitingEntity w WHERE w.memberId = :memberId ORDER BY " +
+           "CASE WHEN w.status = 'RESERVED' THEN 0 ELSE 1 END, " +
+           "w.createdAt DESC")
+    List<WaitingEntity> findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(
+            @Param("memberId") Long memberId, Pageable pageable);
     
     /**
      * 팝업 ID로 최대 대기 번호를 조회한다.

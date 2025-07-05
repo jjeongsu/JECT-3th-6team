@@ -43,10 +43,23 @@ public class WaitingRepositoryAdapter implements WaitingRepository {
     
     @Override
     public List<Waiting> findByQuery(WaitingQuery query) {
-        // WaitingQuery의 memberId를 사용하여 해당 회원의 대기 목록을 조회
-        // 현재는 간단하게 구현하고, 나중에 필요에 따라 확장
-        List<WaitingEntity> entities = waitingJpaRepository.findByMemberIdOrderByCreatedAtDesc(
-                query.memberId(), PageRequest.of(0, query.size()));
+        List<WaitingEntity> entities;
+        
+        // 정렬 조건에 따라 다른 쿼리 메서드 사용
+        switch (query.sortOrder()) {
+            case RESERVED_FIRST_THEN_DATE_DESC:
+                entities = waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(
+                        query.memberId(), PageRequest.of(0, query.size()));
+                break;
+            case DATE_DESC:
+                entities = waitingJpaRepository.findByMemberIdOrderByCreatedAtDesc(
+                        query.memberId(), PageRequest.of(0, query.size()));
+                break;
+            default:
+                // 기본값은 RESERVED_FIRST_THEN_DATE_DESC
+                entities = waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(
+                        query.memberId(), PageRequest.of(0, query.size()));
+        }
         
         return entities.stream()
                 .map(entity -> {
