@@ -1,22 +1,22 @@
 package com.example.demo.application.dto;
 
-import com.example.demo.application.dto.popup.BrandStoryDto;
-import com.example.demo.application.dto.popup.LocationDto;
-import com.example.demo.application.dto.popup.PeriodDto;
-import com.example.demo.application.dto.popup.PopupDetailDto;
-import com.example.demo.application.dto.popup.RatingDto;
-import com.example.demo.application.dto.popup.SearchTagsDto;
+import com.example.demo.application.dto.popup.BrandStoryResponse;
+import com.example.demo.application.dto.popup.LocationResponse;
+import com.example.demo.application.dto.popup.PeriodResponse;
+import com.example.demo.application.dto.popup.PopupDetailInfoResponse;
+import com.example.demo.application.dto.popup.RatingResponse;
+import com.example.demo.application.dto.popup.SearchTagsResponse;
 import java.util.List;
 
 public record PopupDetailResponse(
     Long id,
     List<String> thumbnails,
     int dDay,
-    RatingDto rating,
+    RatingResponse rating,
     String title,
-    SearchTagsDto searchTags,
-    LocationDto location,
-    PeriodDto period,
-    BrandStoryDto brandStory,
-    PopupDetailDto popupDetail
+    SearchTagsResponse searchTags,
+    LocationResponse location,
+    PeriodResponse period,
+    BrandStoryResponse brandStory,
+    PopupDetailInfoResponse popupDetail
 ) {}

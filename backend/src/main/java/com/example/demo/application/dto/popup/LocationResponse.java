@@ -1,6 +1,6 @@
 package com.example.demo.application.dto.popup;
 
-public record LocationDto(
+public record LocationResponse(
     String addressName,
     String region1depthName,
     String region2depthName,

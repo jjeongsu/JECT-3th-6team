@@ -2,7 +2,7 @@ package com.example.demo.application.dto.popup;
 
 import java.util.List;
 
-public record SearchTagsDto(
+public record SearchTagsResponse(
     String type,
     List<String> category
 ) {

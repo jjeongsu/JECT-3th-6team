@@ -2,7 +2,7 @@ package com.example.demo.application.dto.popup;
 
 import java.util.List;
 
-public record BrandStoryDto(
+public record BrandStoryResponse(
     List<String> imageUrls,
-    List<SnsDto> sns
+    List<SnsResponse> sns
 ) {}

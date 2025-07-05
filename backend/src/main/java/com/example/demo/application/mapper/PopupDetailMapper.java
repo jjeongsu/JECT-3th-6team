@@ -1,14 +1,13 @@
 package com.example.demo.application.mapper;
 
-import com.example.demo.application.dto.PopupDetailResponse;
-import com.example.demo.application.dto.popup.BrandStoryDto;
-import com.example.demo.application.dto.popup.DayOfWeekInfoDto;
-import com.example.demo.application.dto.popup.LocationDto;
-import com.example.demo.application.dto.popup.PeriodDto;
-import com.example.demo.application.dto.popup.PopupDetailDto;
-import com.example.demo.application.dto.popup.RatingDto;
-import com.example.demo.application.dto.popup.SearchTagsDto;
-import com.example.demo.application.dto.popup.SnsDto;
+import com.example.demo.application.dto.popup.BrandStoryResponse;
+import com.example.demo.application.dto.popup.DayOfWeekInfoResponse;
+import com.example.demo.application.dto.popup.LocationResponse;
+import com.example.demo.application.dto.popup.PeriodResponse;
+import com.example.demo.application.dto.popup.PopupDetailInfoResponse;
+import com.example.demo.application.dto.popup.RatingResponse;
+import com.example.demo.application.dto.popup.SearchTagsResponse;
+import com.example.demo.application.dto.popup.SnsResponse;
 import com.example.demo.domain.model.BrandStory;
 import com.example.demo.domain.model.DayOfWeekInfo;
 import com.example.demo.domain.model.Location;
@@ -23,8 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PopupDetailMapper {
 
-    public PopupDetailResponse toResponse(PopupDetail popup) {
-        return new PopupDetailResponse(
+    public com.example.demo.application.dto.PopupDetailResponse toResponse(PopupDetail popup) {
+        return new com.example.demo.application.dto.PopupDetailResponse(
             popup.id(),
             popup.thumbnails(),
             popup.dDay(),
@@ -38,19 +37,19 @@ public class PopupDetailMapper {
         );
     }
 
-    private RatingDto toRatingDto(Rating rating) {
+    private RatingResponse toRatingDto(Rating rating) {
         if (rating == null) return null;
-        return new RatingDto(rating.averageStar(), rating.reviewCount());
+        return new RatingResponse(rating.averageStar(), rating.reviewCount());
     }
 
-    private SearchTagsDto toSearchTagsDto(SearchTags tags) {
+    private SearchTagsResponse toSearchTagsDto(SearchTags tags) {
         if (tags == null) return null;
-        return new SearchTagsDto(tags.type(), tags.categoryNames());
+        return new SearchTagsResponse(tags.type(), tags.categoryNames());
     }
 
-    private LocationDto toLocationDto(Location loc) {
+    private LocationResponse toLocationDto(Location loc) {
         if (loc == null) return null;
-        return new LocationDto(
+        return new LocationResponse(
             loc.addressName(),
             loc.region1depthName(),
             loc.region2depthName(),
@@ -60,38 +59,38 @@ public class PopupDetailMapper {
         );
     }
 
-    private PeriodDto toPeriodDto(Period period) {
+    private PeriodResponse toPeriodDto(Period period) {
         if (period == null) return null;
-        return new PeriodDto(
+        return new PeriodResponse(
             period.startDate().toString(),
             period.endDate().toString()
         );
     }
 
-    private BrandStoryDto toBrandStoryDto(BrandStory brandStory) {
+    private BrandStoryResponse toBrandStoryDto(BrandStory brandStory) {
         if (brandStory == null) return null;
-        return new BrandStoryDto(
+        return new BrandStoryResponse(
             brandStory.imageUrls(),
             brandStory.sns().stream()
                 .map(this::toSnsDto)
                 .toList()
         );
     }
-    private SnsDto toSnsDto(Sns sns) {
-        return new SnsDto(sns.icon(), sns.url());
+    private SnsResponse toSnsDto(Sns sns) {
+        return new SnsResponse(sns.icon(), sns.url());
     }
 
-    private PopupDetailDto toPopupDetailDto(PopupDetailInfo detail) {
+    private PopupDetailInfoResponse toPopupDetailDto(PopupDetailInfo detail) {
         if (detail == null) return null;
-        return new PopupDetailDto(
+        return new PopupDetailInfoResponse(
             detail.dayOfWeeks().stream()
                 .map(this::toDayOfWeekInfoDto)
                 .toList(),
             detail.descriptions()
         );
     }
-    private DayOfWeekInfoDto toDayOfWeekInfoDto(DayOfWeekInfo d) {
-        return new DayOfWeekInfoDto(
+    private DayOfWeekInfoResponse toDayOfWeekInfoDto(DayOfWeekInfo d) {
+        return new DayOfWeekInfoResponse(
             d.dayOfWeek(),
             d.value()
         );

@@ -1,6 +1,6 @@
 package com.example.demo.application.dto.popup;
 
-public record RatingDto(
+public record RatingResponse(
     double averageStar,
     int reviewCount
 ) {
