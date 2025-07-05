@@ -23,7 +23,7 @@ public class PopupMapper {
             loc.getAddressName(),
             loc.getRegion1DepthName(),
             loc.getRegion2DepthName(),
-            loc.getRegion3DepthName() != null ? loc.getRegion3DepthName() : "",
+            loc.getRegion3DepthName(),
             loc.getLongitude(),
             loc.getLatitude()
         );
