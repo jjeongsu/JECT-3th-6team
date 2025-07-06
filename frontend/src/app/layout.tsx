@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import localFont from 'next/font/local';
+import { Toaster } from '@/shared/ui';
 
 export const metadata: Metadata = {
   title: 'Popup App',
@@ -28,8 +29,8 @@ export default function RootLayout({
             {/* <Header /> */}
 
             {/* 메인 콘텐츠 영역 */}
+            <Toaster position="top-center" richColors />
             <main className="flex-1">{children}</main>
-
             {/* <BottomNav /> */}
           </div>
         </div>

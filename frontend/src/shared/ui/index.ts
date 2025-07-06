@@ -5,3 +5,4 @@ export { default as NumberInput } from './input/NumberInput';
 export { default as BottomButtonContainer } from './container/BottomButtonContainer';
 export { default as ChipButton } from './button/ChipButton';
 export { default as ModalContainer } from './modal/ModalContainer';
+export { default as Toaster } from './toast/Toast';

@@ -17,6 +17,7 @@ import {
 } from '@/features/reservation/model/ErrorCodeMap';
 import { useState } from 'react';
 import ReservationCheckModal from '@/features/reservation/ui/ReservationCheckModal';
+import { toast } from 'sonner';
 
 export default function OnsiteReservationForm() {
   const { formValue, error, handleChange, handleReset, validateForm } = useForm(
@@ -44,7 +45,7 @@ export default function OnsiteReservationForm() {
   const handleModalOpen = () => {
     const { isValid, errorMessage } = validateForm();
     if (!isValid) {
-      alert(errorMessage);
+      toast.warning(errorMessage);
     } else {
       setIsOpenModal(true);
     }
@@ -54,13 +55,16 @@ export default function OnsiteReservationForm() {
   };
 
   const handleSubmit = async () => {
-    alert('폼 제출 완료');
+    // TODO : 폼 제출 로직 구현
+
+    toast.success('폼 제출 완료');
   };
 
   return (
     <div>
       <div className={'px-5 flex flex-col gap-y-11.5 mt-4'}>
         <TextInput
+          inputMode={'text'}
           label={'대기자 명'}
           placeholder={'대기자명을 입력하세요'}
           id={'reservation-name'}
@@ -80,6 +84,7 @@ export default function OnsiteReservationForm() {
         />
 
         <TextInput
+          inputMode={'email'}
           label={'대기자 이메일'}
           placeholder={'user@gmail.com'}
           id={'reservation-email'}
