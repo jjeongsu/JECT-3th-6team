@@ -95,14 +95,14 @@ export default function OnsiteReservationForm({
         />
       </div>
 
-      <BottomButtonContainer>
+      <BottomButtonContainer hasShadow={false}>
         <StandardButton
           onClick={handleReset}
           disabled={false}
           size={'fit'}
           color={'white'}
           hasShadow={false}
-          className={'rounded-xl'}
+          className={'rounded-[10px]'}
         >
           <div className={'flex items-center gap-x-2'}>
             <Image
