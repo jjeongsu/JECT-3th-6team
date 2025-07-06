@@ -2,6 +2,7 @@
 
 import {
   BottomButtonContainer,
+  ModalContainer,
   NumberInput,
   StandardButton,
   TextInput,
@@ -14,26 +15,47 @@ import {
   MAX_HEAD_COUNT,
   MIN_HEAD_COUNT,
 } from '@/features/reservation/model/ErrorCodeMap';
+import { useState } from 'react';
+import ReservationCheckModal from '@/features/reservation/ui/ReservationCheckModal';
 
 export default function OnsiteReservationForm() {
-  const { formValue, error, handleChange, handleReset } = useForm({
-    formType: 'onsite-reservation',
-    initialFormValue: {
-      name: '',
-      headCount: 1,
-      email: '',
-    },
-    initialError: {
-      name: '',
-      headCount: '',
-      email: '',
-    },
-  });
+  const { formValue, error, handleChange, handleReset, validateForm } = useForm(
+    {
+      formType: 'onsite-reservation',
+      initialFormValue: {
+        name: '',
+        headCount: 1,
+        email: '',
+      },
+      initialError: {
+        name: '',
+        headCount: '',
+        email: '',
+      },
+    }
+  );
+  const [isOpenModal, setIsOpenModal] = useState(false);
 
   const headcountError =
     formValue.headCount >= MAX_HEAD_COUNT
       ? ERROR_CODE_MAP.ALERT_MAX_HEADCOUNT
       : ERROR_CODE_MAP.NONE;
+
+  const handleModalOpen = () => {
+    const { isValid, errorMessage } = validateForm();
+    if (!isValid) {
+      alert(errorMessage);
+    } else {
+      setIsOpenModal(true);
+    }
+  };
+  const handleModalClose = () => {
+    setIsOpenModal(false);
+  };
+
+  const handleSubmit = async () => {
+    alert('폼 제출 완료');
+  };
 
   return (
     <div>
@@ -75,7 +97,7 @@ export default function OnsiteReservationForm() {
           size={'fit'}
           color={'white'}
           hasShadow={false}
-          customClass={'rounded-lg'}
+          className={'rounded-xl'}
         >
           <div className={'flex items-center gap-x-2'}>
             <Image
@@ -90,15 +112,22 @@ export default function OnsiteReservationForm() {
         </StandardButton>
 
         <StandardButton
-          onClick={() => console.log('예약!')}
+          onClick={handleModalOpen}
           disabled={false}
           size={'full'}
           color={'primary'}
           hasShadow={false}
         >
-          적용하기
+          확인
         </StandardButton>
       </BottomButtonContainer>
+      <ModalContainer open={isOpenModal}>
+        <ReservationCheckModal
+          handleModalClose={handleModalClose}
+          handleSubmit={handleSubmit}
+          data={formValue}
+        />
+      </ModalContainer>
     </div>
   );
 }
