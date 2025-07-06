@@ -1,6 +1,5 @@
 import PageHeader from '@/shared/ui/header/PageHeader';
 import { ReservationSummaryView } from '@/features/reservation';
-import { BottomButtonContainer, StandardButton } from '@/shared/ui';
 
 export default async function ReservationCompletePage({
   params,
