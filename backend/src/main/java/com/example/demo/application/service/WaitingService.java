@@ -4,7 +4,11 @@ import com.example.demo.application.dto.VisitHistoryCursorResponse;
 import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;
-import com.example.demo.domain.model.*;
+import com.example.demo.application.mapper.WaitingMapper;
+import com.example.demo.domain.model.Member;
+import com.example.demo.domain.model.Waiting;
+import com.example.demo.domain.model.WaitingQuery;
+import com.example.demo.domain.model.WaitingStatus;
 import com.example.demo.domain.port.MemberRepository;
 import com.example.demo.domain.port.PopupRepository;
 import com.example.demo.domain.port.WaitingRepository;
@@ -23,6 +27,7 @@ public class WaitingService {
     private final WaitingRepository waitingRepository;
     private final PopupRepository popupRepository;
     private final MemberRepository memberRepository;
+    private final WaitingMapper waitingMapper;
 
     /**
      * 현장 대기 신청
@@ -36,11 +41,11 @@ public class WaitingService {
         // 2. 다음 대기 번호 조회
         Integer nextWaitingNumber = waitingRepository.getNextWaitingNumber(request.popupId());
         
-        // 2. 회원 정보 조회
+        // 3. 회원 정보 조회
         Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다: " + request.memberId()));
         
-        // 3. 대기 정보 생성
+        // 4. 대기 정보 생성
         Waiting waiting = new Waiting(
                 null, // ID는 저장소에서 생성
                 popup,
@@ -53,19 +58,11 @@ public class WaitingService {
                 LocalDateTime.now()
         );
         
-        // 4. 대기 정보 저장
+        // 5. 대기 정보 저장
         Waiting savedWaiting = waitingRepository.save(waiting);
         
-        // 5. 응답 생성
-        return new WaitingCreateResponse(
-                savedWaiting.id(),
-                savedWaiting.popup().title(),
-                savedWaiting.member().name(),
-                savedWaiting.peopleCount(),
-                savedWaiting.contactEmail(),
-                savedWaiting.waitingNumber(),
-                savedWaiting.registeredAt()
-        );
+        // 6. 응답 생성
+        return waitingMapper.toCreateResponse(savedWaiting);
     }
 
     /**
@@ -88,37 +85,13 @@ public class WaitingService {
         
         // 4. DTO 변환
         List<WaitingResponse> waitingResponses = waitings.stream()
-                .map(this::toWaitingResponse)
+                .map(waitingMapper::toResponse)
                 .toList();
         
         return new VisitHistoryCursorResponse(waitingResponses, lastId, hasNext);
     }
-    
-    /**
-     * Waiting 도메인 모델을 WaitingResponse DTO로 변환
-     */
-    private WaitingResponse toWaitingResponse(Waiting waiting) {
-        return new WaitingResponse(
-                waiting.id(),
-                waiting.popup().id(),
-                waiting.popup().title(),
-                waiting.popup().thumbnails().isEmpty() ? null : waiting.popup().thumbnails().getFirst(),
-                waiting.popup().location().region1depthName() + ", " + waiting.popup().location().region2depthName(),
-                new com.example.demo.application.dto.RatingResponse(
-                        waiting.popup().rating().averageStar(),
-                        waiting.popup().rating().reviewCount()
-                ),
-                formatPeriod(waiting.popup().period()),
-                waiting.waitingNumber(),
-                waiting.status().name()
-        );
-    }
-    
-    /**
-     * 기간을 클라이언트 표시용 포맷으로 변환
-     */
-    private String formatPeriod(Period period) {
-        // TODO: 실제 기간 포맷팅 로직 구현
-        return "6월 10일 ~ 6월 20일";
+
+    public WaitingService copy(WaitingMapper waitingMapper) {
+        return new WaitingService(waitingRepository, popupRepository, memberRepository, waitingMapper);
     }
 } 
