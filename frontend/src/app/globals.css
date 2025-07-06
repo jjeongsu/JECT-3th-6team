@@ -34,10 +34,13 @@
   /*primary*/
   --color-main: rgba(254, 163, 31, 1);
   --color-sub: rgba(255, 232, 199, 1);
+  --color-sub2: #FFF8EC;
   --color-sub-pale: rgba(255, 232, 199, 0.3);
   --color-main-active: rgba(217, 105, 0, 1);
   /*other-color*/
   --color-red: rgba(255, 89, 89, 1);
+  --color-modal-overlay : rgba(40, 40, 40, 0.40);
+
 
   /*ganwon-font*/
   --font-gangwon: 'GangwonEdu Power', sans-serif;
