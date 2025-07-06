@@ -19,8 +19,8 @@ public class MemberMapper {
     public Member toDomain(MemberEntity entity) {
         return new Member(
                 entity.getId(),
-                entity.getEmail(),
-                entity.getName()
+                entity.getName(),
+                entity.getEmail()
         );
     }
 } 

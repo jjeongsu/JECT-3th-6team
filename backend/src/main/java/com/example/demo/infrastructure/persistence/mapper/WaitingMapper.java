@@ -44,6 +44,7 @@ public class WaitingMapper {
         return WaitingEntity.builder()
                 .popupId(waiting.popup().id())
                 .memberId(waiting.member().id())
+                .waitingPersonName(waiting.waitingPersonName())
                 .contactEmail(waiting.contactEmail())
                 .peopleCount(waiting.peopleCount())
                 .waitingNumber(waiting.waitingNumber())
