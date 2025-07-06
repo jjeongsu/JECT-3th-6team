@@ -41,12 +41,11 @@ export default function useForm<T extends FormType>({
 }: UseFormProps<T>) {
   const [formValue, setFormValue] = useState<FormValueMap[T]>(initialFormValue);
   const [error, setError] = useState<FormErrorMap[T]>(initialError);
-
   const [currentValue, setCurrentValue] = useState<string | number>('');
   const [currentField, setCurrentField] = useState<
     keyof FormValueMap[T] | null
   >(null);
-
+  const [isFormValid, setIsFormValid] = useState(false);
   const validateField = (
     field: keyof FormValueMap[T],
     value: string | number
@@ -109,6 +108,10 @@ export default function useForm<T extends FormType>({
     }
   };
 
+  useEffect(() => {
+    const { isValid } = validateForm();
+    setIsFormValid(isValid);
+  }, [formValue, error]);
   return {
     formValue,
     error,
@@ -116,5 +119,6 @@ export default function useForm<T extends FormType>({
     validateField,
     handleReset,
     validateForm,
+    isFormValid,
   };
 }

@@ -18,24 +18,28 @@ import {
 import { useState } from 'react';
 import ReservationCheckModal from '@/features/reservation/ui/ReservationCheckModal';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
-export default function OnsiteReservationForm() {
-  const { formValue, error, handleChange, handleReset, validateForm } = useForm(
-    {
-      formType: 'onsite-reservation',
-      initialFormValue: {
-        name: '',
-        headCount: 1,
-        email: '',
-      },
-      initialError: {
-        name: '',
-        headCount: '',
-        email: '',
-      },
-    }
-  );
+export default function OnsiteReservationForm({
+  popupId,
+}: {
+  popupId: number;
+}) {
+  const { formValue, error, handleChange, handleReset, isFormValid } = useForm({
+    formType: 'onsite-reservation',
+    initialFormValue: {
+      name: '',
+      headCount: 1,
+      email: '',
+    },
+    initialError: {
+      name: '',
+      headCount: '',
+      email: '',
+    },
+  });
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const router = useRouter();
 
   const headcountError =
     formValue.headCount >= MAX_HEAD_COUNT
@@ -43,12 +47,7 @@ export default function OnsiteReservationForm() {
       : ERROR_CODE_MAP.NONE;
 
   const handleModalOpen = () => {
-    const { isValid, errorMessage } = validateForm();
-    if (!isValid) {
-      toast.warning(errorMessage);
-    } else {
-      setIsOpenModal(true);
-    }
+    setIsOpenModal(true);
   };
   const handleModalClose = () => {
     setIsOpenModal(false);
@@ -57,7 +56,8 @@ export default function OnsiteReservationForm() {
   const handleSubmit = async () => {
     // TODO : 폼 제출 로직 구현
 
-    toast.success('폼 제출 완료');
+    toast.success('대기 예약 완료');
+    router.push(`/reservation/complete/${popupId}`);
   };
 
   return (
@@ -118,7 +118,7 @@ export default function OnsiteReservationForm() {
 
         <StandardButton
           onClick={handleModalOpen}
-          disabled={false}
+          disabled={!isFormValid}
           size={'full'}
           color={'primary'}
           hasShadow={false}

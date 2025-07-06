@@ -57,7 +57,7 @@ export class FormValidate {
   }
 
   static validateOnsiteReservation(formValue: OnsiteReservationFormValue) {
-    const { name, headCount, email } = formValue;
+    const { name, email } = formValue;
 
     if (name.length === 0 || email.length === 0) {
       return {
