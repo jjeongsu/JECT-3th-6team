@@ -1,17 +1,13 @@
 package com.example.demo.application.service;
 
+import com.example.demo.application.dto.VisitHistoryCursorResponse;
 import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;
-import com.example.demo.application.dto.VisitHistoryCursorResponse;
-import com.example.demo.domain.model.Member;
-import com.example.demo.domain.model.Period;
-import com.example.demo.domain.model.Waiting;
-import com.example.demo.domain.model.WaitingQuery;
-import com.example.demo.domain.model.WaitingStatus;
-import com.example.demo.domain.port.WaitingRepository;
-import com.example.demo.domain.port.PopupRepository;
+import com.example.demo.domain.model.*;
 import com.example.demo.domain.port.MemberRepository;
+import com.example.demo.domain.port.PopupRepository;
+import com.example.demo.domain.port.WaitingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,6 +44,7 @@ public class WaitingService {
         Waiting waiting = new Waiting(
                 null, // ID는 저장소에서 생성
                 popup,
+                request.name(),
                 member,
                 request.contactEmail(),
                 request.peopleCount(),
@@ -74,6 +71,7 @@ public class WaitingService {
     /**
      * 내 방문/예약 내역 조회 (무한 스크롤)
      */
+    @Transactional(readOnly = true)
     public VisitHistoryCursorResponse getVisitHistory(Integer size, Long lastWaitingId, String status) {
         // TODO: 사용자 인증 확인 (현재는 임시로 memberId = 1 사용)
         Long memberId = 1L;
@@ -86,7 +84,7 @@ public class WaitingService {
         
         // 3. 다음 페이지 존재 여부 확인
         boolean hasNext = waitings.size() == size;
-        Long lastId = waitings.isEmpty() ? null : waitings.get(waitings.size() - 1).id();
+        Long lastId = waitings.isEmpty() ? null : waitings.getLast().id();
         
         // 4. DTO 변환
         List<WaitingResponse> waitingResponses = waitings.stream()
@@ -104,7 +102,7 @@ public class WaitingService {
                 waiting.id(),
                 waiting.popup().id(),
                 waiting.popup().title(),
-                waiting.popup().thumbnails().isEmpty() ? null : waiting.popup().thumbnails().get(0),
+                waiting.popup().thumbnails().isEmpty() ? null : waiting.popup().thumbnails().getFirst(),
                 waiting.popup().location().region1depthName() + ", " + waiting.popup().location().region2depthName(),
                 new com.example.demo.application.dto.RatingResponse(
                         waiting.popup().rating().averageStar(),

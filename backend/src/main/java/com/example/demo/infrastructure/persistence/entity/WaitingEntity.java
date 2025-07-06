@@ -2,14 +2,7 @@ package com.example.demo.infrastructure.persistence.entity;
 
 import com.example.demo.common.entity.BaseEntity;
 import com.example.demo.domain.model.WaitingStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 /**
@@ -31,6 +24,9 @@ public class WaitingEntity extends BaseEntity {
     
     @Column(name = "popup_id", nullable = false)
     private Long popupId;
+
+    @Column(name = "waiting_person_name", nullable = false)
+    private String waitingPersonName;
     
     @Column(name = "member_id", nullable = false)
     private Long memberId;

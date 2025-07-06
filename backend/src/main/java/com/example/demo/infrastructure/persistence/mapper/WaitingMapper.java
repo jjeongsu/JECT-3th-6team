@@ -24,6 +24,7 @@ public class WaitingMapper {
         return new Waiting(
                 entity.getId(),
                 popupDetail,
+                entity.getWaitingPersonName(),
                 member,
                 entity.getContactEmail(),
                 entity.getPeopleCount(),
