@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * Waiting 도메인 모델과 DTO 간의 변환을 담당하는 Mapper.
  */
 @Component
-public class WaitingMapper {
+public class WaitingDtoMapper {
     
     /**
      * Waiting 도메인 모델을 WaitingCreateResponse DTO로 변환

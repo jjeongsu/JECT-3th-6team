@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * Waiting 도메인 모델과 WaitingEntity 간의 변환을 담당하는 Mapper.
  */
 @Component
-public class WaitingMapper {
+public class WaitingEntityMapper {
     
     /**
      * WaitingEntity를 Waiting 도메인 모델로 변환한다.

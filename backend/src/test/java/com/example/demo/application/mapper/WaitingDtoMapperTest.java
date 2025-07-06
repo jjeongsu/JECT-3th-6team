@@ -1,12 +1,11 @@
 package com.example.demo.application.mapper;
 
-import com.example.demo.application.dto.RatingResponse;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;
 import com.example.demo.domain.model.*;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WaitingMapperTest {
+class WaitingDtoMapperTest {
 
     @Nested
     @DisplayName("toCreateResponse 테스트")
@@ -42,7 +41,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingCreateResponse result = new WaitingMapper().toCreateResponse(waiting);
+            WaitingCreateResponse result = new WaitingDtoMapper().toCreateResponse(waiting);
 
             // then
             assertNotNull(result);
@@ -66,7 +65,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingCreateResponse result = new WaitingMapper().toCreateResponse(waiting);
+            WaitingCreateResponse result = new WaitingDtoMapper().toCreateResponse(waiting);
 
             // then
             assertNotNull(result);
@@ -106,7 +105,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingResponse result = new WaitingMapper().toResponse(waiting);
+            WaitingResponse result = new WaitingDtoMapper().toResponse(waiting);
 
             // then
             assertNotNull(result);
@@ -143,7 +142,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingResponse result = new WaitingMapper().toResponse(waiting);
+            WaitingResponse result = new WaitingDtoMapper().toResponse(waiting);
 
             // then
             assertNotNull(result);
@@ -180,7 +179,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingResponse result = new WaitingMapper().toResponse(waiting);
+            WaitingResponse result = new WaitingDtoMapper().toResponse(waiting);
 
             // then
             assertNotNull(result);

@@ -1,9 +1,8 @@
 package com.example.demo.infrastructure.persistence.adapter;
 
 import com.example.demo.domain.model.*;
-import com.example.demo.domain.port.WaitingRepository;
 import com.example.demo.infrastructure.persistence.entity.WaitingEntity;
-import com.example.demo.infrastructure.persistence.mapper.WaitingMapper;
+import com.example.demo.infrastructure.persistence.mapper.WaitingEntityMapper;
 import com.example.demo.infrastructure.persistence.repository.WaitingJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +29,7 @@ class WaitingRepositoryAdapterTest {
     private WaitingJpaRepository waitingJpaRepository;
 
     @Mock
-    private WaitingMapper waitingMapper;
+    private WaitingEntityMapper waitingEntityMapper;
 
     @InjectMocks
     private WaitingRepositoryAdapter waitingRepositoryAdapter;
@@ -85,9 +84,9 @@ class WaitingRepositoryAdapterTest {
                 "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now()
             );
 
-            when(waitingMapper.toEntity(validWaiting)).thenReturn(entity);
+            when(waitingEntityMapper.toEntity(validWaiting)).thenReturn(entity);
             when(waitingJpaRepository.save(entity)).thenReturn(savedEntity);
-            when(waitingMapper.toDomain(savedEntity, validWaiting.popup(), validWaiting.member()))
+            when(waitingEntityMapper.toDomain(savedEntity, validWaiting.popup(), validWaiting.member()))
                 .thenReturn(expectedWaiting);
 
             // when
@@ -103,9 +102,9 @@ class WaitingRepositoryAdapterTest {
             assertEquals(WaitingStatus.RESERVED, result.status());
 
             // verify
-            verify(waitingMapper).toEntity(validWaiting);
+            verify(waitingEntityMapper).toEntity(validWaiting);
             verify(waitingJpaRepository).save(entity);
-            verify(waitingMapper).toDomain(savedEntity, validWaiting.popup(), validWaiting.member());
+            verify(waitingEntityMapper).toDomain(savedEntity, validWaiting.popup(), validWaiting.member());
         }
 
         @Test
@@ -122,16 +121,16 @@ class WaitingRepositoryAdapterTest {
                 .status(WaitingStatus.RESERVED)
                 .build();
 
-            when(waitingMapper.toEntity(validWaiting)).thenReturn(entity);
+            when(waitingEntityMapper.toEntity(validWaiting)).thenReturn(entity);
             when(waitingJpaRepository.save(entity)).thenThrow(new RuntimeException("저장 실패"));
 
             // when & then
             assertThrows(RuntimeException.class, () -> waitingRepositoryAdapter.save(validWaiting));
 
             // verify
-            verify(waitingMapper).toEntity(validWaiting);
+            verify(waitingEntityMapper).toEntity(validWaiting);
             verify(waitingJpaRepository).save(entity);
-            verify(waitingMapper, never()).toDomain(any(), any(), any());
+            verify(waitingEntityMapper, never()).toDomain(any(), any(), any());
         }
     }
 
@@ -185,8 +184,8 @@ class WaitingRepositoryAdapterTest {
 
             when(waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10)))
                 .thenReturn(entities);
-            when(waitingMapper.toDomain(entity1, null, null)).thenReturn(waiting1);
-            when(waitingMapper.toDomain(entity2, null, null)).thenReturn(waiting2);
+            when(waitingEntityMapper.toDomain(entity1, null, null)).thenReturn(waiting1);
+            when(waitingEntityMapper.toDomain(entity2, null, null)).thenReturn(waiting2);
 
             // when
             List<Waiting> result = waitingRepositoryAdapter.findByQuery(query);
@@ -199,8 +198,8 @@ class WaitingRepositoryAdapterTest {
 
             // verify
             verify(waitingJpaRepository).findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10));
-            verify(waitingMapper).toDomain(entity1, null, null);
-            verify(waitingMapper).toDomain(entity2, null, null);
+            verify(waitingEntityMapper).toDomain(entity1, null, null);
+            verify(waitingEntityMapper).toDomain(entity2, null, null);
         }
 
         @Test
@@ -225,7 +224,7 @@ class WaitingRepositoryAdapterTest {
 
             when(waitingJpaRepository.findByMemberIdOrderByCreatedAtDesc(1L, PageRequest.of(0, 10)))
                 .thenReturn(entities);
-            when(waitingMapper.toDomain(entity, null, null)).thenReturn(waiting);
+            when(waitingEntityMapper.toDomain(entity, null, null)).thenReturn(waiting);
 
             // when
             List<Waiting> result = waitingRepositoryAdapter.findByQuery(query);
@@ -237,7 +236,7 @@ class WaitingRepositoryAdapterTest {
 
             // verify
             verify(waitingJpaRepository).findByMemberIdOrderByCreatedAtDesc(1L, PageRequest.of(0, 10));
-            verify(waitingMapper).toDomain(entity, null, null);
+            verify(waitingEntityMapper).toDomain(entity, null, null);
         }
 
         @Test
@@ -262,7 +261,7 @@ class WaitingRepositoryAdapterTest {
 
             when(waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10)))
                 .thenReturn(entities);
-            when(waitingMapper.toDomain(entity, null, null)).thenReturn(waiting);
+            when(waitingEntityMapper.toDomain(entity, null, null)).thenReturn(waiting);
 
             // when
             List<Waiting> result = waitingRepositoryAdapter.findByQuery(query);
@@ -273,7 +272,7 @@ class WaitingRepositoryAdapterTest {
 
             // verify
             verify(waitingJpaRepository).findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10));
-            verify(waitingMapper).toDomain(entity, null, null);
+            verify(waitingEntityMapper).toDomain(entity, null, null);
         }
 
         @Test
@@ -296,7 +295,7 @@ class WaitingRepositoryAdapterTest {
 
             // verify
             verify(waitingJpaRepository).findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10));
-            verify(waitingMapper, never()).toDomain(any(), any(), any());
+            verify(waitingEntityMapper, never()).toDomain(any(), any(), any());
         }
     }
 

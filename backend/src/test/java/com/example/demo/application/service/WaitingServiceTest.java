@@ -4,7 +4,7 @@ import com.example.demo.application.dto.VisitHistoryCursorResponse;
 import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;
-import com.example.demo.application.mapper.WaitingMapper;
+import com.example.demo.application.mapper.WaitingDtoMapper;
 import com.example.demo.domain.model.*;
 import com.example.demo.domain.port.MemberRepository;
 import com.example.demo.domain.port.PopupRepository;
@@ -39,7 +39,7 @@ class WaitingServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private WaitingMapper waitingMapper;
+    private WaitingDtoMapper waitingDtoMapper;
 
     @InjectMocks
     private WaitingService waitingService;
@@ -83,7 +83,7 @@ class WaitingServiceTest {
             when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(nextWaitingNumber);
             when(memberRepository.findById(1L)).thenReturn(Optional.of(validMember));
             when(waitingRepository.save(any(Waiting.class))).thenReturn(savedWaiting);
-            when(waitingMapper.toCreateResponse(savedWaiting)).thenReturn(expectedResponse);
+            when(waitingDtoMapper.toCreateResponse(savedWaiting)).thenReturn(expectedResponse);
 
             // when
             WaitingCreateResponse response = waitingService.createWaiting(validRequest);
@@ -97,7 +97,7 @@ class WaitingServiceTest {
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository).findById(1L);
             verify(waitingRepository).save(any(Waiting.class));
-            verify(waitingMapper).toCreateResponse(savedWaiting);
+            verify(waitingDtoMapper).toCreateResponse(savedWaiting);
         }
 
         @Test
@@ -123,7 +123,7 @@ class WaitingServiceTest {
             verify(waitingRepository, never()).getNextWaitingNumber(any());
             verify(memberRepository, never()).findById(any());
             verify(waitingRepository, never()).save(any());
-            verify(waitingMapper, never()).toCreateResponse(any());
+            verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
 
         @Test
@@ -151,7 +151,7 @@ class WaitingServiceTest {
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository).findById(999L);
             verify(waitingRepository, never()).save(any());
-            verify(waitingMapper, never()).toCreateResponse(any());
+            verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
 
         @Test
@@ -171,7 +171,7 @@ class WaitingServiceTest {
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository).findById(1L);
             verify(waitingRepository).save(any(Waiting.class));
-            verify(waitingMapper, never()).toCreateResponse(any());
+            verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
 
         @Test
@@ -189,7 +189,7 @@ class WaitingServiceTest {
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository, never()).findById(any());
             verify(waitingRepository, never()).save(any());
-            verify(waitingMapper, never()).toCreateResponse(any());
+            verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
     }
 
@@ -245,8 +245,8 @@ class WaitingServiceTest {
             List<WaitingResponse> waitingResponses = List.of(waitingResponse1, waitingResponse2);
 
             when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
-            when(waitingMapper.toResponse(waiting1)).thenReturn(waitingResponse1);
-            when(waitingMapper.toResponse(waiting2)).thenReturn(waitingResponse2);
+            when(waitingDtoMapper.toResponse(waiting1)).thenReturn(waitingResponse1);
+            when(waitingDtoMapper.toResponse(waiting2)).thenReturn(waitingResponse2);
 
             // when
             VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
@@ -259,8 +259,8 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper).toResponse(waiting1);
-            verify(waitingMapper).toResponse(waiting2);
+            verify(waitingDtoMapper).toResponse(waiting1);
+            verify(waitingDtoMapper).toResponse(waiting2);
         }
 
         @Test
@@ -280,8 +280,8 @@ class WaitingServiceTest {
             WaitingResponse waitingResponse2 = new WaitingResponse(2L, 1L, "테스트 팝업", "thumbnail1.jpg", "서울특별시, 강남구", new com.example.demo.application.dto.RatingResponse(4.5, 100), "6월 10일 ~ 6월 20일", 2, "COMPLETED");
 
             when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
-            when(waitingMapper.toResponse(waiting1)).thenReturn(waitingResponse1);
-            when(waitingMapper.toResponse(waiting2)).thenReturn(waitingResponse2);
+            when(waitingDtoMapper.toResponse(waiting1)).thenReturn(waitingResponse1);
+            when(waitingDtoMapper.toResponse(waiting2)).thenReturn(waitingResponse2);
 
             // when
             VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
@@ -294,8 +294,8 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper).toResponse(waiting1);
-            verify(waitingMapper).toResponse(waiting2);
+            verify(waitingDtoMapper).toResponse(waiting1);
+            verify(waitingDtoMapper).toResponse(waiting2);
         }
 
         @Test
@@ -321,7 +321,7 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper, never()).toResponse(any());
+            verify(waitingDtoMapper, never()).toResponse(any());
         }
 
         @Test
@@ -347,7 +347,7 @@ class WaitingServiceTest {
             );
 
             when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
-            when(waitingMapper.toResponse(waiting)).thenReturn(waitingResponse);
+            when(waitingDtoMapper.toResponse(waiting)).thenReturn(waitingResponse);
 
             // when
             VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
@@ -359,7 +359,7 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper).toResponse(waiting);
+            verify(waitingDtoMapper).toResponse(waiting);
         }
 
         @Test
@@ -385,7 +385,7 @@ class WaitingServiceTest {
             );
 
             when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
-            when(waitingMapper.toResponse(waiting)).thenReturn(waitingResponse);
+            when(waitingDtoMapper.toResponse(waiting)).thenReturn(waitingResponse);
 
             // when
             VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
@@ -397,7 +397,7 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper).toResponse(waiting);
+            verify(waitingDtoMapper).toResponse(waiting);
         }
 
         @Test
@@ -415,7 +415,7 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository, never()).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper, never()).toResponse(any());
+            verify(waitingDtoMapper, never()).toResponse(any());
         }
 
         @Test
@@ -450,7 +450,7 @@ class WaitingServiceTest {
             );
 
             when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
-            when(waitingMapper.toResponse(waiting)).thenReturn(waitingResponse);
+            when(waitingDtoMapper.toResponse(waiting)).thenReturn(waitingResponse);
 
             // when
             VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
@@ -462,7 +462,7 @@ class WaitingServiceTest {
 
             // verify
             verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingMapper).toResponse(waiting);
+            verify(waitingDtoMapper).toResponse(waiting);
         }
     }
 }

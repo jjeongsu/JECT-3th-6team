@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class WaitingMapperTest {
+class WaitingDtoMapperTest {
 
     @Nested
     @DisplayName("toDomain 테스트")
@@ -38,7 +38,7 @@ class WaitingMapperTest {
             WaitingEntity entity = createTestWaitingEntity(1L, 1L, "홍길동", 1L, "hong@example.com", 2, 1, WaitingStatus.RESERVED, createdAt);
 
             // when
-            Waiting result = new WaitingMapper().toDomain(entity, validPopup, validMember);
+            Waiting result = new WaitingEntityMapper().toDomain(entity, validPopup, validMember);
 
             // then
             assertNotNull(result);
@@ -61,7 +61,7 @@ class WaitingMapperTest {
             WaitingEntity entity = createTestWaitingEntity(1L, 1L, "홍길동", 1L, "hong@example.com", 2, 1, WaitingStatus.RESERVED, createdAt);
 
             // when
-            Waiting result = new WaitingMapper().toDomain(entity, null, null);
+            Waiting result = new WaitingEntityMapper().toDomain(entity, null, null);
 
             // then
             assertNotNull(result);
@@ -83,7 +83,7 @@ class WaitingMapperTest {
             WaitingEntity entity = createTestWaitingEntity(1L, 1L, "김철수", 1L, "kim@example.com", 3, 2, WaitingStatus.COMPLETED, createdAt);
 
             // when
-            Waiting result = new WaitingMapper().toDomain(entity, validPopup, validMember);
+            Waiting result = new WaitingEntityMapper().toDomain(entity, validPopup, validMember);
 
             // then
             assertNotNull(result);
@@ -146,7 +146,7 @@ class WaitingMapperTest {
         @DisplayName("정상적인 Waiting 도메인 모델을 WaitingEntity로 변환 테스트")
         public void test01() {
             // when
-            WaitingEntity result = new WaitingMapper().toEntity(validWaiting);
+            WaitingEntity result = new WaitingEntityMapper().toEntity(validWaiting);
 
             // then
             assertNotNull(result);
@@ -169,7 +169,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingEntity result = new WaitingMapper().toEntity(completedWaiting);
+            WaitingEntity result = new WaitingEntityMapper().toEntity(completedWaiting);
 
             // then
             assertNotNull(result);
@@ -192,7 +192,7 @@ class WaitingMapperTest {
             );
 
             // when
-            WaitingEntity result = new WaitingMapper().toEntity(largeGroupWaiting);
+            WaitingEntity result = new WaitingEntityMapper().toEntity(largeGroupWaiting);
 
             // then
             assertNotNull(result);

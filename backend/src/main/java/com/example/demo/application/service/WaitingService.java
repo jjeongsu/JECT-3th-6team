@@ -4,7 +4,7 @@ import com.example.demo.application.dto.VisitHistoryCursorResponse;
 import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;
-import com.example.demo.application.mapper.WaitingMapper;
+import com.example.demo.application.mapper.WaitingDtoMapper;
 import com.example.demo.domain.model.Member;
 import com.example.demo.domain.model.Waiting;
 import com.example.demo.domain.model.WaitingQuery;
@@ -27,7 +27,7 @@ public class WaitingService {
     private final WaitingRepository waitingRepository;
     private final PopupRepository popupRepository;
     private final MemberRepository memberRepository;
-    private final WaitingMapper waitingMapper;
+    private final WaitingDtoMapper waitingDtoMapper;
 
     /**
      * 현장 대기 신청
@@ -62,7 +62,7 @@ public class WaitingService {
         Waiting savedWaiting = waitingRepository.save(waiting);
         
         // 6. 응답 생성
-        return waitingMapper.toCreateResponse(savedWaiting);
+        return waitingDtoMapper.toCreateResponse(savedWaiting);
     }
 
     /**
@@ -85,13 +85,13 @@ public class WaitingService {
         
         // 4. DTO 변환
         List<WaitingResponse> waitingResponses = waitings.stream()
-                .map(waitingMapper::toResponse)
+                .map(waitingDtoMapper::toResponse)
                 .toList();
         
         return new VisitHistoryCursorResponse(waitingResponses, lastId, hasNext);
     }
 
-    public WaitingService copy(WaitingMapper waitingMapper) {
-        return new WaitingService(waitingRepository, popupRepository, memberRepository, waitingMapper);
+    public WaitingService copy(WaitingDtoMapper waitingDtoMapper) {
+        return new WaitingService(waitingRepository, popupRepository, memberRepository, waitingDtoMapper);
     }
 } 
