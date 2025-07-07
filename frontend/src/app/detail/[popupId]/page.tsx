@@ -1,14 +1,11 @@
 "use client"
 
-import React from "react"
-import { ChevronRight, MapPin, Star, Clock } from "lucide-react"
-
 import { Badge } from "@/shared/ui/badge/Badge"
 import { Tag } from "@/shared/ui/tag/Tag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DescriptionTab } from "@/app/features/detail/ui/DescriptionTab"
-import { ReviewTab } from "@/app/features/detail/ui/ReviewTab"
-import { ImageCarousel } from "@/app/features/detail/ui/ImageCarousel"
+import { DescriptionTab } from "@/features/detail/ui/DescriptionTab"
+import { ReviewTab } from "@/features/detail/ui/ReviewTab"
+import { ImageCarousel } from "@/features/detail/ui/ImageCarousel"
 import { SemiBoldText } from "@/shared/ui/text/SemiBoldText"
 import { MediumText } from "@/shared/ui/text/MediumText"
 import Image from "next/image"
