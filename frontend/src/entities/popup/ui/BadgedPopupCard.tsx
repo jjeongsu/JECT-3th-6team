@@ -4,7 +4,7 @@ import {
   VisitedPopupListItemType,
 } from '@/entities/popup/types/PopupListItem';
 import { dateToPeriodStr } from '@/entities/popup/lib/dateToPeriodStr';
-import { Badge } from '@/app/shared/ui/badge/Badge';
+import { Badge } from '@/shared/ui/badge/Badge';
 import PopupCardView from '@/entities/popup/ui/PopupCardView';
 import IconClock from '@/assets/icons/Normal/Icon_Clock.svg';
 import React from 'react';
