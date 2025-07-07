@@ -25,7 +25,7 @@ export default function Navbar() {
   return (
     <div
       className={
-        'bg-white w-full max-w-screen min-w-[320px] py-[34px] fixed bottom-0 flex justify-around pt-1 '
+        'bg-white w-full max-w-[430px] min-w-[320px] py-[34px] fixed bottom-0 flex justify-around pt-1 '
       }
     >
       {navItems.map((item, index) => {
