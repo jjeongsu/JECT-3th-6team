@@ -3,6 +3,7 @@ import {
   VisitedPopupListItemType,
 } from '@/entities/popup/types/PopupListItem';
 import BadgedPopupCard from '@/entities/popup/ui/BadgedPopupCard';
+import { Navbar } from '@/widgets';
 
 const popupList: (PopupListItemType | VisitedPopupListItemType)[] = [
   {
@@ -95,10 +96,13 @@ const popupList: (PopupListItemType | VisitedPopupListItemType)[] = [
 
 export default function Home() {
   return (
-    <div className={'flex flex-col gap-y-3 px-2 mt-4'}>
-      {popupList.map((popup, index) => (
-        <BadgedPopupCard {...popup} key={index} />
-      ))}
+    <div className={'w-fulls'}>
+      <div className={'flex flex-col gap-y-3 px-2 mt-4'}>
+        {popupList.map((popup, index) => (
+          <BadgedPopupCard {...popup} key={index} />
+        ))}
+      </div>
+      <Navbar />
     </div>
   );
 }
