@@ -20,11 +20,8 @@ const PopupBadge = (data: PopupItemType): React.ReactElement => {
   const BADGE_POSITION_STYLE = 'absolute top-[12px] left-[8px]';
   if (isPopupListItem(data)) {
     return (
-      <Badge
-        icon={<IconClock width={12} height={12} fill={'var(--color-white)'} />}
-        iconPosition="left"
-        className={BADGE_POSITION_STYLE}
-      >
+      <Badge className={BADGE_POSITION_STYLE}>
+        <IconClock width={12} height={12} fill={'var(--color-white)'} />
         {data.dDay}일 남음
       </Badge>
     );
