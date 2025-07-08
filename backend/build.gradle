@@ -40,7 +40,7 @@ tasks.named('test') {
     useJUnitPlatform()
     
     // 병렬 실행 설정
-    maxParallelForks = 2
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
     forkEvery = 1
     
     // 테스트 실행 시 로그 출력
