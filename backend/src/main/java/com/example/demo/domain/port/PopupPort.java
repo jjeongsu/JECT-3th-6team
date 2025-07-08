@@ -1,9 +1,10 @@
 package com.example.demo.domain.port;
 
 import com.example.demo.domain.model.PopupDetail;
+
 import java.util.Optional;
 
-public interface PopupLoadPort {
+public interface PopupPort {
     /**
      * ID로 팝업 상세 정보를 조회한다.
      * 존재하지 않을 경우 Optional.empty()를 반환한다.

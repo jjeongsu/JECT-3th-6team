@@ -1,7 +1,7 @@
 package com.example.demo.infrastructure.persistence.adapter;
 
 import com.example.demo.domain.model.*;
-import com.example.demo.domain.port.PopupLoadPort;
+import com.example.demo.domain.port.PopupPort;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupContentEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupImageEntity;
 import com.example.demo.infrastructure.persistence.entity.popup.PopupImageType;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class PopupLoadAdapter implements PopupLoadPort {
+public class PopupPortAdapter implements PopupPort {
     private final PopupImageRepository popupImageRepository;
     private final PopupCategoryRepository popupCategoryRepository;
     private final PopupContentRepository popupContentRepository;
@@ -25,7 +25,7 @@ public class PopupLoadAdapter implements PopupLoadPort {
     private final PopupReviewRepository popupReviewRepository;
     private final PopupSocialRepository popupSocialRepository;
     private final PopupWeeklyScheduleRepository popupWeeklyScheduleRepository;
-    private final PopupRepository popupRepository;
+    private final com.example.demo.infrastructure.persistence.repository.PopupRepository popupRepository;
     private final PopupEntityMapper popupEntityMapper;
 
     @Override

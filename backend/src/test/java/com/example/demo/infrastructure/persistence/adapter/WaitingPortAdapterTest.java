@@ -23,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class WaitingRepositoryAdapterTest {
+class WaitingPortAdapterTest {
 
     @Mock
     private WaitingJpaRepository waitingJpaRepository;
@@ -32,26 +32,26 @@ class WaitingRepositoryAdapterTest {
     private WaitingEntityMapper waitingEntityMapper;
 
     @InjectMocks
-    private WaitingRepositoryAdapter waitingRepositoryAdapter;
+    private WaitingPortAdapter waitingRepositoryAdapter;
 
     @Nested
     @DisplayName("save 테스트")
     class Test01 {
         // 테스트용 유효한 데이터
         private final PopupDetail validPopup = new PopupDetail(
-            1L, "테스트 팝업", List.of("thumbnail1.jpg"), 5,
-            new Rating(4.5, 100), new SearchTags("팝업", List.of("테스트")),
-            new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
-            new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
-            new BrandStory(List.of("brand1.jpg"), List.of()),
-            new PopupDetailInfo(List.of(), List.of("상세 설명"))
+                1L, "테스트 팝업", List.of("thumbnail1.jpg"), 5,
+                new Rating(4.5, 100), new SearchTags("팝업", List.of("테스트")),
+                new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
+                new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
+                new BrandStory(List.of("brand1.jpg"), List.of()),
+                new PopupDetailInfo(List.of(), List.of("상세 설명"))
         );
 
         private final Member validMember = new Member(1L, "테스트 사용자", "test@example.com");
 
         private final Waiting validWaiting = new Waiting(
-            null, validPopup, "홍길동", validMember,
-            "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now()
+                null, validPopup, "홍길동", validMember,
+                "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now()
         );
 
         @Test
@@ -59,35 +59,35 @@ class WaitingRepositoryAdapterTest {
         public void test01() {
             // given
             WaitingEntity entity = WaitingEntity.builder()
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("홍길동")
-                .contactEmail("hong@example.com")
-                .peopleCount(2)
-                .waitingNumber(1)
-                .status(WaitingStatus.RESERVED)
-                .build();
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("홍길동")
+                    .contactEmail("hong@example.com")
+                    .peopleCount(2)
+                    .waitingNumber(1)
+                    .status(WaitingStatus.RESERVED)
+                    .build();
 
             WaitingEntity savedEntity = WaitingEntity.builder()
-                .id(1L)
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("홍길동")
-                .contactEmail("hong@example.com")
-                .peopleCount(2)
-                .waitingNumber(1)
-                .status(WaitingStatus.RESERVED)
-                .build();
+                    .id(1L)
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("홍길동")
+                    .contactEmail("hong@example.com")
+                    .peopleCount(2)
+                    .waitingNumber(1)
+                    .status(WaitingStatus.RESERVED)
+                    .build();
 
             Waiting expectedWaiting = new Waiting(
-                1L, validPopup, "홍길동", validMember,
-                "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now()
+                    1L, validPopup, "홍길동", validMember,
+                    "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now()
             );
 
             when(waitingEntityMapper.toEntity(validWaiting)).thenReturn(entity);
             when(waitingJpaRepository.save(entity)).thenReturn(savedEntity);
             when(waitingEntityMapper.toDomain(savedEntity, validWaiting.popup(), validWaiting.member()))
-                .thenReturn(expectedWaiting);
+                    .thenReturn(expectedWaiting);
 
             // when
             Waiting result = waitingRepositoryAdapter.save(validWaiting);
@@ -112,14 +112,14 @@ class WaitingRepositoryAdapterTest {
         public void test02() {
             // given
             WaitingEntity entity = WaitingEntity.builder()
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("홍길동")
-                .contactEmail("hong@example.com")
-                .peopleCount(2)
-                .waitingNumber(1)
-                .status(WaitingStatus.RESERVED)
-                .build();
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("홍길동")
+                    .contactEmail("hong@example.com")
+                    .peopleCount(2)
+                    .waitingNumber(1)
+                    .status(WaitingStatus.RESERVED)
+                    .build();
 
             when(waitingEntityMapper.toEntity(validWaiting)).thenReturn(entity);
             when(waitingJpaRepository.save(entity)).thenThrow(new RuntimeException("저장 실패"));
@@ -139,12 +139,12 @@ class WaitingRepositoryAdapterTest {
     class Test02 {
         // 테스트용 유효한 데이터
         private final PopupDetail validPopup = new PopupDetail(
-            1L, "테스트 팝업", List.of("thumbnail1.jpg"), 5,
-            new Rating(4.5, 100), new SearchTags("팝업", List.of("테스트")),
-            new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
-            new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
-            new BrandStory(List.of("brand1.jpg"), List.of()),
-            new PopupDetailInfo(List.of(), List.of("상세 설명"))
+                1L, "테스트 팝업", List.of("thumbnail1.jpg"), 5,
+                new Rating(4.5, 100), new SearchTags("팝업", List.of("테스트")),
+                new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
+                new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
+                new BrandStory(List.of("brand1.jpg"), List.of()),
+                new PopupDetailInfo(List.of(), List.of("상세 설명"))
         );
 
         private final Member validMember = new Member(1L, "테스트 사용자", "test@example.com");
@@ -154,28 +154,28 @@ class WaitingRepositoryAdapterTest {
         public void test01() {
             // given
             WaitingQuery query = new WaitingQuery(1L, 10, null, null, WaitingQuery.SortOrder.RESERVED_FIRST_THEN_DATE_DESC);
-            
+
             WaitingEntity entity1 = WaitingEntity.builder()
-                .id(1L)
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("홍길동")
-                .contactEmail("hong@example.com")
-                .peopleCount(2)
-                .waitingNumber(1)
-                .status(WaitingStatus.RESERVED)
-                .build();
+                    .id(1L)
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("홍길동")
+                    .contactEmail("hong@example.com")
+                    .peopleCount(2)
+                    .waitingNumber(1)
+                    .status(WaitingStatus.RESERVED)
+                    .build();
 
             WaitingEntity entity2 = WaitingEntity.builder()
-                .id(2L)
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("김철수")
-                .contactEmail("kim@example.com")
-                .peopleCount(3)
-                .waitingNumber(2)
-                .status(WaitingStatus.COMPLETED)
-                .build();
+                    .id(2L)
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("김철수")
+                    .contactEmail("kim@example.com")
+                    .peopleCount(3)
+                    .waitingNumber(2)
+                    .status(WaitingStatus.COMPLETED)
+                    .build();
 
             List<WaitingEntity> entities = List.of(entity1, entity2);
 
@@ -183,7 +183,7 @@ class WaitingRepositoryAdapterTest {
             Waiting waiting2 = new Waiting(2L, validPopup, "김철수", validMember, "kim@example.com", 3, 2, WaitingStatus.COMPLETED, LocalDateTime.now());
 
             when(waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10)))
-                .thenReturn(entities);
+                    .thenReturn(entities);
             when(waitingEntityMapper.toDomain(entity1, null, null)).thenReturn(waiting1);
             when(waitingEntityMapper.toDomain(entity2, null, null)).thenReturn(waiting2);
 
@@ -207,23 +207,23 @@ class WaitingRepositoryAdapterTest {
         public void test02() {
             // given
             WaitingQuery query = new WaitingQuery(1L, 10, null, null, WaitingQuery.SortOrder.DATE_DESC);
-            
+
             WaitingEntity entity = WaitingEntity.builder()
-                .id(1L)
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("홍길동")
-                .contactEmail("hong@example.com")
-                .peopleCount(2)
-                .waitingNumber(1)
-                .status(WaitingStatus.RESERVED)
-                .build();
+                    .id(1L)
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("홍길동")
+                    .contactEmail("hong@example.com")
+                    .peopleCount(2)
+                    .waitingNumber(1)
+                    .status(WaitingStatus.RESERVED)
+                    .build();
 
             List<WaitingEntity> entities = List.of(entity);
             Waiting waiting = new Waiting(1L, validPopup, "홍길동", validMember, "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now());
 
             when(waitingJpaRepository.findByMemberIdOrderByCreatedAtDesc(1L, PageRequest.of(0, 10)))
-                .thenReturn(entities);
+                    .thenReturn(entities);
             when(waitingEntityMapper.toDomain(entity, null, null)).thenReturn(waiting);
 
             // when
@@ -244,23 +244,23 @@ class WaitingRepositoryAdapterTest {
         public void test03() {
             // given
             WaitingQuery query = new WaitingQuery(1L, 10, null, null, WaitingQuery.SortOrder.RESERVED_FIRST_THEN_DATE_DESC);
-            
+
             WaitingEntity entity = WaitingEntity.builder()
-                .id(1L)
-                .popupId(1L)
-                .memberId(1L)
-                .waitingPersonName("홍길동")
-                .contactEmail("hong@example.com")
-                .peopleCount(2)
-                .waitingNumber(1)
-                .status(WaitingStatus.RESERVED)
-                .build();
+                    .id(1L)
+                    .popupId(1L)
+                    .memberId(1L)
+                    .waitingPersonName("홍길동")
+                    .contactEmail("hong@example.com")
+                    .peopleCount(2)
+                    .waitingNumber(1)
+                    .status(WaitingStatus.RESERVED)
+                    .build();
 
             List<WaitingEntity> entities = List.of(entity);
             Waiting waiting = new Waiting(1L, validPopup, "홍길동", validMember, "hong@example.com", 2, 1, WaitingStatus.RESERVED, LocalDateTime.now());
 
             when(waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10)))
-                .thenReturn(entities);
+                    .thenReturn(entities);
             when(waitingEntityMapper.toDomain(entity, null, null)).thenReturn(waiting);
 
             // when
@@ -280,11 +280,11 @@ class WaitingRepositoryAdapterTest {
         public void test04() {
             // given
             WaitingQuery query = new WaitingQuery(1L, 10, null, null, WaitingQuery.SortOrder.RESERVED_FIRST_THEN_DATE_DESC);
-            
+
             List<WaitingEntity> emptyEntities = List.of();
 
             when(waitingJpaRepository.findByMemberIdOrderByStatusReservedFirstThenCreatedAtDesc(1L, WaitingStatus.RESERVED, PageRequest.of(0, 10)))
-                .thenReturn(emptyEntities);
+                    .thenReturn(emptyEntities);
 
             // when
             List<Waiting> result = waitingRepositoryAdapter.findByQuery(query);
@@ -311,7 +311,7 @@ class WaitingRepositoryAdapterTest {
             Integer maxWaitingNumber = 5;
 
             when(waitingJpaRepository.findMaxWaitingNumberByPopupId(popupId))
-                .thenReturn(Optional.of(maxWaitingNumber));
+                    .thenReturn(Optional.of(maxWaitingNumber));
 
             // when
             Integer result = waitingRepositoryAdapter.getNextWaitingNumber(popupId);
@@ -330,7 +330,7 @@ class WaitingRepositoryAdapterTest {
             Long popupId = 1L;
 
             when(waitingJpaRepository.findMaxWaitingNumberByPopupId(popupId))
-                .thenReturn(Optional.empty());
+                    .thenReturn(Optional.empty());
 
             // when
             Integer result = waitingRepositoryAdapter.getNextWaitingNumber(popupId);
@@ -349,7 +349,7 @@ class WaitingRepositoryAdapterTest {
             Long popupId = 1L;
 
             when(waitingJpaRepository.findMaxWaitingNumberByPopupId(popupId))
-                .thenThrow(new RuntimeException("조회 실패"));
+                    .thenThrow(new RuntimeException("조회 실패"));
 
             // when & then
             assertThrows(RuntimeException.class, () -> waitingRepositoryAdapter.getNextWaitingNumber(popupId));
