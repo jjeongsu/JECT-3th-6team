@@ -7,7 +7,7 @@ import com.example.demo.application.dto.WaitingResponse;
 import com.example.demo.application.mapper.WaitingDtoMapper;
 import com.example.demo.domain.model.*;
 import com.example.demo.domain.port.MemberRepository;
-import com.example.demo.domain.port.PopupRepository;
+import com.example.demo.domain.port.PopupLoadPort;
 import com.example.demo.domain.port.WaitingRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,7 +33,7 @@ class WaitingServiceTest {
     private WaitingRepository waitingRepository;
 
     @Mock
-    private PopupRepository popupRepository;
+    private PopupLoadPort popupLoadPort;
 
     @Mock
     private MemberRepository memberRepository;
@@ -79,7 +79,7 @@ class WaitingServiceTest {
                     1L, "테스트 팝업", "홍길동", 2, "hong@example.com", nextWaitingNumber, registeredAt
             );
 
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(popupLoadPort.findDetailById(1L)).thenReturn(Optional.of(validPopup));
             when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(nextWaitingNumber);
             when(memberRepository.findById(1L)).thenReturn(Optional.of(validMember));
             when(waitingRepository.save(any(Waiting.class))).thenReturn(savedWaiting);
@@ -93,7 +93,7 @@ class WaitingServiceTest {
             assertEquals(expectedResponse, response);
 
             // verify
-            verify(popupRepository).findById(1L);
+            verify(popupLoadPort).findDetailById(1L);
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository).findById(1L);
             verify(waitingRepository).save(any(Waiting.class));
@@ -104,7 +104,7 @@ class WaitingServiceTest {
         @DisplayName("존재하지 않는 팝업으로 대기 신청 시 예외 발생")
         public void test02() {
             // given
-            when(popupRepository.findById(999L)).thenReturn(Optional.empty());
+            when(popupLoadPort.findDetailById(999L)).thenReturn(Optional.empty());
 
             WaitingCreateRequest invalidRequest = new WaitingCreateRequest(
                     999L, 1L, "홍길동", 2, "hong@example.com"
@@ -119,7 +119,7 @@ class WaitingServiceTest {
             assertEquals("팝업을 찾을 수 없습니다: 999", exception.getMessage());
 
             // verify
-            verify(popupRepository).findById(999L);
+            verify(popupLoadPort).findDetailById(999L);
             verify(waitingRepository, never()).getNextWaitingNumber(any());
             verify(memberRepository, never()).findById(any());
             verify(waitingRepository, never()).save(any());
@@ -130,7 +130,7 @@ class WaitingServiceTest {
         @DisplayName("존재하지 않는 회원으로 대기 신청 시 예외 발생")
         public void test03() {
             // given
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(popupLoadPort.findDetailById(1L)).thenReturn(Optional.of(validPopup));
             when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(5);
             when(memberRepository.findById(999L)).thenReturn(Optional.empty());
 
@@ -147,7 +147,7 @@ class WaitingServiceTest {
             assertEquals("회원을 찾을 수 없습니다: 999", exception.getMessage());
 
             // verify
-            verify(popupRepository).findById(1L);
+            verify(popupLoadPort).findDetailById(1L);
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository).findById(999L);
             verify(waitingRepository, never()).save(any());
@@ -158,7 +158,7 @@ class WaitingServiceTest {
         @DisplayName("대기 정보 저장 시 예외 발생")
         public void test04() {
             // given
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(popupLoadPort.findDetailById(1L)).thenReturn(Optional.of(validPopup));
             when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(5);
             when(memberRepository.findById(1L)).thenReturn(Optional.of(validMember));
             when(waitingRepository.save(any(Waiting.class))).thenThrow(new RuntimeException("저장 실패"));
@@ -167,7 +167,7 @@ class WaitingServiceTest {
             assertThrows(RuntimeException.class, () -> waitingService.createWaiting(validRequest));
 
             // verify
-            verify(popupRepository).findById(1L);
+            verify(popupLoadPort).findDetailById(1L);
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository).findById(1L);
             verify(waitingRepository).save(any(Waiting.class));
@@ -178,14 +178,14 @@ class WaitingServiceTest {
         @DisplayName("대기 번호 조회 시 예외 발생")
         public void test05() {
             // given
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(popupLoadPort.findDetailById(1L)).thenReturn(Optional.of(validPopup));
             when(waitingRepository.getNextWaitingNumber(1L)).thenThrow(new RuntimeException("대기 번호 조회 실패"));
 
             // when & then
             assertThrows(RuntimeException.class, () -> waitingService.createWaiting(validRequest));
 
             // verify
-            verify(popupRepository).findById(1L);
+            verify(popupLoadPort).findDetailById(1L);
             verify(waitingRepository).getNextWaitingNumber(1L);
             verify(memberRepository, never()).findById(any());
             verify(waitingRepository, never()).save(any());

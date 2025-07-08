@@ -10,7 +10,7 @@ import com.example.demo.domain.model.Waiting;
 import com.example.demo.domain.model.WaitingQuery;
 import com.example.demo.domain.model.WaitingStatus;
 import com.example.demo.domain.port.MemberRepository;
-import com.example.demo.domain.port.PopupRepository;
+import com.example.demo.domain.port.PopupLoadPort;
 import com.example.demo.domain.port.WaitingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ import java.util.List;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
-    private final PopupRepository popupRepository;
+    private final PopupLoadPort popupLoadPort;
     private final MemberRepository memberRepository;
     private final WaitingDtoMapper waitingDtoMapper;
 
@@ -35,7 +35,7 @@ public class WaitingService {
     @Transactional
     public WaitingCreateResponse createWaiting(WaitingCreateRequest request) {
         // 1. 팝업 존재 여부 확인
-        var popup = popupRepository.findById(request.popupId())
+        var popup = popupLoadPort.findDetailById(request.popupId())
                 .orElseThrow(() -> new IllegalArgumentException("팝업을 찾을 수 없습니다: " + request.popupId()));
         
         // 2. 다음 대기 번호 조회
@@ -89,9 +89,5 @@ public class WaitingService {
                 .toList();
         
         return new VisitHistoryCursorResponse(waitingResponses, lastId, hasNext);
-    }
-
-    public WaitingService copy(WaitingDtoMapper waitingDtoMapper) {
-        return new WaitingService(waitingRepository, popupRepository, memberRepository, waitingDtoMapper);
     }
 } 

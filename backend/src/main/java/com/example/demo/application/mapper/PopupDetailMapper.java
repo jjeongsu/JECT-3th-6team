@@ -1,29 +1,15 @@
 package com.example.demo.application.mapper;
 
-import com.example.demo.application.dto.popup.BrandStoryResponse;
-import com.example.demo.application.dto.popup.DayOfWeekInfoResponse;
-import com.example.demo.application.dto.popup.LocationResponse;
-import com.example.demo.application.dto.popup.PeriodResponse;
-import com.example.demo.application.dto.popup.PopupDetailInfoResponse;
-import com.example.demo.application.dto.popup.RatingResponse;
-import com.example.demo.application.dto.popup.SearchTagsResponse;
-import com.example.demo.application.dto.popup.SnsResponse;
-import com.example.demo.domain.model.BrandStory;
-import com.example.demo.domain.model.DayOfWeekInfo;
-import com.example.demo.domain.model.Location;
-import com.example.demo.domain.model.Period;
-import com.example.demo.domain.model.PopupDetail;
-import com.example.demo.domain.model.PopupDetailInfo;
-import com.example.demo.domain.model.Rating;
-import com.example.demo.domain.model.SearchTags;
-import com.example.demo.domain.model.Sns;
+import com.example.demo.application.dto.PopupDetailResponse;
+import com.example.demo.application.dto.popup.*;
+import com.example.demo.domain.model.*;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PopupDetailMapper {
 
-    public com.example.demo.application.dto.PopupDetailResponse toResponse(PopupDetail popup) {
-        return new com.example.demo.application.dto.PopupDetailResponse(
+    public PopupDetailResponse toResponse(PopupDetail popup) {
+        return new PopupDetailResponse(
             popup.id(),
             popup.thumbnails(),
             popup.dDay(),
