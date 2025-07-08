@@ -12,9 +12,9 @@ import lombok.*;
 @Entity
 @Table(name = "waitings")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class WaitingEntity extends BaseEntity {
     
     @Id
