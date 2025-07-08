@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
  * Member 도메인 모델과 MemberEntity 간의 변환을 담당하는 Mapper.
  */
 @Component
-public class MemberMapper {
-    
+public class MemberEntityMapper {
+
     /**
      * MemberEntity를 Member 도메인 모델로 변환한다.
-     * 
+     *
      * @param entity MemberEntity
      * @return Member 도메인 모델
      */

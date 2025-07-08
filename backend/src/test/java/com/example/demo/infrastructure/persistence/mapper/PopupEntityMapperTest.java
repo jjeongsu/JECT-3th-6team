@@ -11,8 +11,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PopupMapperTest {
-    private final PopupMapper popupMapper = new PopupMapper();
+class PopupEntityMapperTest {
+    private final PopupEntityMapper popupEntityMapper = new PopupEntityMapper();
 
     @Test
     @DisplayName("toLocation: PopupLocationEntity -> Location 변환")
@@ -26,7 +26,7 @@ class PopupMapperTest {
                 .latitude(37.5665)
                 .build();
 
-        Location location = popupMapper.toLocation(entity);
+        Location location = popupEntityMapper.toLocation(entity);
         assertThat(location.addressName()).isEqualTo("서울시 강남구");
         assertThat(location.region1depthName()).isEqualTo("서울특별시");
         assertThat(location.region2depthName()).isEqualTo("강남구");
@@ -41,7 +41,7 @@ class PopupMapperTest {
         PopupCategoryEntity cat1 = PopupCategoryEntity.builder().name("아트").build();
         PopupCategoryEntity cat2 = PopupCategoryEntity.builder().name("패션").build();
         List<PopupCategoryEntity> categories = List.of(cat1, cat2);
-        SearchTags tags = popupMapper.toSearchTags("팝업", categories);
+        SearchTags tags = popupEntityMapper.toSearchTags("팝업", categories);
         assertThat(tags.type()).isEqualTo("팝업");
         assertThat(tags.categoryNames()).containsExactly("아트", "패션");
     }
@@ -52,7 +52,7 @@ class PopupMapperTest {
         PopupReviewEntity r1 = PopupReviewEntity.builder().rating(5).content("").build();
         PopupReviewEntity r2 = PopupReviewEntity.builder().rating(3).content("").build();
         List<PopupReviewEntity> reviews = List.of(r1, r2);
-        Rating rating = popupMapper.toRating(reviews);
+        Rating rating = popupEntityMapper.toRating(reviews);
         assertThat(rating.averageStar()).isEqualTo(4.0);
         assertThat(rating.reviewCount()).isEqualTo(2);
     }
@@ -68,7 +68,7 @@ class PopupMapperTest {
         PopupSocialEntity sns2 = PopupSocialEntity.builder().iconUrl("icon2.png").linkUrl("http://sns2").build();
         List<PopupSocialEntity> socials = List.of(sns1, sns2);
 
-        BrandStory brandStory = popupMapper.toBrandStory(images, socials);
+        BrandStory brandStory = popupEntityMapper.toBrandStory(images, socials);
         assertThat(brandStory.imageUrls()).containsExactly("img1.jpg", "img2.jpg");
         assertThat(brandStory.sns().stream().map(Sns::icon)).containsExactly("icon1.png", "icon2.png");
         assertThat(brandStory.sns().stream().map(Sns::url)).containsExactly("http://sns1", "http://sns2");
@@ -83,7 +83,7 @@ class PopupMapperTest {
                 .closeTime(LocalTime.of(18, 0))
                 .build();
         List<PopupWeeklyScheduleEntity> schedules = List.of(s1);
-        List<DayOfWeekInfo> infos = popupMapper.toDayOfWeekInfos(schedules);
+        List<DayOfWeekInfo> infos = popupEntityMapper.toDayOfWeekInfos(schedules);
         assertThat(infos).hasSize(1);
         assertThat(infos.getFirst().dayOfWeek()).isEqualTo("MONDAY");
         assertThat(infos.getFirst().value()).isEqualTo("10:00 ~ 18:00");

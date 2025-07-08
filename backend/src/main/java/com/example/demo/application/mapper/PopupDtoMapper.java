@@ -6,20 +6,20 @@ import com.example.demo.domain.model.*;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PopupDetailMapper {
+public class PopupDtoMapper {
 
     public PopupDetailResponse toResponse(PopupDetail popup) {
         return new PopupDetailResponse(
-            popup.id(),
-            popup.thumbnails(),
-            popup.dDay(),
-            toRatingDto(popup.rating()),
-            popup.title(),
-            toSearchTagsDto(popup.searchTags()),
-            toLocationDto(popup.location()),
-            toPeriodDto(popup.period()),
-            toBrandStoryDto(popup.brandStory()),
-            toPopupDetailDto(popup.popupDetail())
+                popup.id(),
+                popup.thumbnails(),
+                popup.dDay(),
+                toRatingDto(popup.rating()),
+                popup.title(),
+                toSearchTagsDto(popup.searchTags()),
+                toLocationDto(popup.location()),
+                toPeriodDto(popup.period()),
+                toBrandStoryDto(popup.brandStory()),
+                toPopupDetailDto(popup.popupDetail())
         );
     }
 
@@ -36,32 +36,33 @@ public class PopupDetailMapper {
     private LocationResponse toLocationDto(Location loc) {
         if (loc == null) return null;
         return new LocationResponse(
-            loc.addressName(),
-            loc.region1depthName(),
-            loc.region2depthName(),
-            loc.region3depthName(),
-            loc.longitude(),
-            loc.latitude()
+                loc.addressName(),
+                loc.region1depthName(),
+                loc.region2depthName(),
+                loc.region3depthName(),
+                loc.longitude(),
+                loc.latitude()
         );
     }
 
     private PeriodResponse toPeriodDto(Period period) {
         if (period == null) return null;
         return new PeriodResponse(
-            period.startDate().toString(),
-            period.endDate().toString()
+                period.startDate().toString(),
+                period.endDate().toString()
         );
     }
 
     private BrandStoryResponse toBrandStoryDto(BrandStory brandStory) {
         if (brandStory == null) return null;
         return new BrandStoryResponse(
-            brandStory.imageUrls(),
-            brandStory.sns().stream()
-                .map(this::toSnsDto)
-                .toList()
+                brandStory.imageUrls(),
+                brandStory.sns().stream()
+                        .map(this::toSnsDto)
+                        .toList()
         );
     }
+
     private SnsResponse toSnsDto(Sns sns) {
         return new SnsResponse(sns.icon(), sns.url());
     }
@@ -69,16 +70,17 @@ public class PopupDetailMapper {
     private PopupDetailInfoResponse toPopupDetailDto(PopupDetailInfo detail) {
         if (detail == null) return null;
         return new PopupDetailInfoResponse(
-            detail.dayOfWeeks().stream()
-                .map(this::toDayOfWeekInfoDto)
-                .toList(),
-            detail.descriptions()
+                detail.dayOfWeeks().stream()
+                        .map(this::toDayOfWeekInfoDto)
+                        .toList(),
+                detail.descriptions()
         );
     }
+
     private DayOfWeekInfoResponse toDayOfWeekInfoDto(DayOfWeekInfo d) {
         return new DayOfWeekInfoResponse(
-            d.dayOfWeek(),
-            d.value()
+                d.dayOfWeek(),
+                d.value()
         );
     }
 }

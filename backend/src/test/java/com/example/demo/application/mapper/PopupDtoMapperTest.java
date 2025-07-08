@@ -11,8 +11,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PopupDetailMapperTest {
-    private final PopupDetailMapper mapper = new PopupDetailMapper();
+class PopupDtoMapperTest {
+    private final PopupDtoMapper mapper = new PopupDtoMapper();
 
     @Test
     @DisplayName("toResponse: PopupDetail -> PopupDetailResponse 변환")

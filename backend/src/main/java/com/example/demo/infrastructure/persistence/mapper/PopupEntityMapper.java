@@ -10,7 +10,7 @@ import java.util.List;
  * PopupDetail 도메인 모델과 PopupEntity 간의 변환을 담당하는 Mapper.
  */
 @Component
-public class PopupMapper {
+public class PopupEntityMapper {
 
     public Location toLocation(PopupLocationEntity loc) {
         return new Location(
