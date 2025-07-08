@@ -1,18 +1,6 @@
 package com.example.demo.infrastructure.persistence.mapper;
 
 import com.example.demo.domain.model.*;
-import com.example.demo.domain.model.Period;
-import com.example.demo.domain.model.PopupDetail;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupEntity;
-import com.example.demo.domain.model.Rating;
-import com.example.demo.domain.model.SearchTags;
-import com.example.demo.domain.model.Sns;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupCategoryEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupImageEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupReviewEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupSocialEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupWeeklyScheduleEntity;
-import java.util.List;
 import com.example.demo.infrastructure.persistence.entity.popup.*;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +31,17 @@ public class PopupMapper {
                 new Period(entity.getStartDate(), entity.getEndDate()),
                 null, // brandStory
                 null  // popupDetail
+        );
+    }
+
+    public Location toLocation(PopupLocationEntity loc) {
+        return new Location(
+                loc.getAddressName(),
+                loc.getRegion1DepthName(),
+                loc.getRegion2DepthName(),
+                loc.getRegion3DepthName(),
+                loc.getLongitude(),
+                loc.getLatitude()
         );
     }
 
