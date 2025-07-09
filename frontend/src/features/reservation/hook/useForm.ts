@@ -16,7 +16,7 @@ type FormErrorMap = {
   'onsite-reservation': OnsiteReservationFormError;
 };
 
-type OnsiteReservationFormValue = {
+export type OnsiteReservationFormValue = {
   name: string;
   headCount: number;
   email: string;
@@ -45,7 +45,7 @@ export default function useForm<T extends FormType>({
   const [currentField, setCurrentField] = useState<
     keyof FormValueMap[T] | null
   >(null);
-
+  const [isFormValid, setIsFormValid] = useState(false);
   const validateField = (
     field: keyof FormValueMap[T],
     value: string | number
@@ -96,11 +96,29 @@ export default function useForm<T extends FormType>({
     setError(initialError);
   };
 
+  // 폼 전체 유효성 검증,
+  const validateForm = () => {
+    switch (formType) {
+      case 'onsite-reservation':
+        const error = FormValidate.validateOnsiteReservation(formValue);
+        return {
+          isValid: error.isValid,
+          errorMessage: ERROR_CODE_MAP[error.errorCode],
+        };
+    }
+  };
+
+  useEffect(() => {
+    const { isValid } = validateForm();
+    setIsFormValid(isValid);
+  }, [formValue, error]);
   return {
     formValue,
     error,
     handleChange,
     validateField,
     handleReset,
+    validateForm,
+    isFormValid,
   };
 }
