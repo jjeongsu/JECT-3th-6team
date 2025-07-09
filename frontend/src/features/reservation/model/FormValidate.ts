@@ -1,4 +1,5 @@
 import { ERROR_CODE_MAP } from '@/features/reservation/model/ErrorCodeMap';
+import { OnsiteReservationFormValue } from '@/features/reservation/hook/useForm';
 
 type ValidateResultType = {
   isValid: boolean;
@@ -15,6 +16,13 @@ export class FormValidate {
   }
 
   static validateEmail(email: string): ValidateResultType {
+    if (email.length === 0) {
+      return {
+        isValid: false,
+        errorCode: 'EMPTY_EMAIL',
+      };
+    }
+
     if (!this.EMAIL_REGEX.test(email)) {
       return {
         isValid: false,
@@ -40,6 +48,33 @@ export class FormValidate {
         isValid: false,
         errorCode: 'SPECIAL_CHAR_INCLUDED',
       };
+    }
+
+    return {
+      isValid: true,
+      errorCode: 'NONE',
+    };
+  }
+
+  static validateOnsiteReservation(formValue: OnsiteReservationFormValue) {
+    const { name, email } = formValue;
+
+    if (name.length === 0 || email.length === 0) {
+      return {
+        isValid: false,
+        errorCode: 'EMPTY_FIELD_EXIST',
+      };
+    }
+
+    // 모든 필드가 유효성 검증을 완료했는지 확인
+    const nameValidation = this.validateName(name);
+    if (!nameValidation.isValid) {
+      return nameValidation;
+    }
+
+    const emailValidation = this.validateEmail(email);
+    if (!emailValidation.isValid) {
+      return emailValidation;
     }
 
     return {
