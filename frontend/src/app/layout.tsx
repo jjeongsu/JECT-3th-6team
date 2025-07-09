@@ -31,6 +31,7 @@ export default function RootLayout({
             {/* 메인 콘텐츠 영역 */}
             <Toaster position="top-center" richColors />
             <main className="flex-1">{children}</main>
+
             {/* <BottomNav /> */}
           </div>
         </div>
