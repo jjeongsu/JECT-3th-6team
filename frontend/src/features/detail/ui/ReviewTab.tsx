@@ -1,5 +1,6 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Star } from "lucide-react"
+import { TabsContent } from '@/components/ui/tabs';
+import { Star } from 'lucide-react';
+
 export function ReviewTab() {
   return (
     <TabsContent value="reviews" className="px-5 py-6">
@@ -22,8 +23,11 @@ export function ReviewTab() {
               <div>
                 <p className="text-sm font-medium">김**</p>
                 <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-3 h-3 fill-orange-400 text-orange-400" />
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star
+                      key={star}
+                      className="w-3 h-3 fill-orange-400 text-orange-400"
+                    />
                   ))}
                 </div>
               </div>
@@ -41,8 +45,11 @@ export function ReviewTab() {
               <div>
                 <p className="text-sm font-medium">이**</p>
                 <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4].map((star) => (
-                    <Star key={star} className="w-3 h-3 fill-orange-400 text-orange-400" />
+                  {[1, 2, 3, 4].map(star => (
+                    <Star
+                      key={star}
+                      className="w-3 h-3 fill-orange-400 text-orange-400"
+                    />
                   ))}
                   <Star className="w-3 h-3 text-gray-300" />
                 </div>
@@ -55,5 +62,5 @@ export function ReviewTab() {
         </div>
       </div>
     </TabsContent>
-  )
+  );
 }

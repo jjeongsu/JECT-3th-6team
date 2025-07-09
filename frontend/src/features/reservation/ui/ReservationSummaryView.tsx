@@ -7,7 +7,15 @@ import IconMap from '/public/icons/Normal/Icon_map.svg';
 import { BottomButtonContainer, StandardButton } from '@/shared/ui';
 import { useRouter } from 'next/navigation';
 
-const ContentBlock: React.FC<ContentBlockProps> = ({ label, value }) => (
+type ContentBlockProps = {
+  label: string;
+  value: string | number;
+};
+
+const ContentBlock: React.FC<ContentBlockProps> = ({
+  label,
+  value,
+}: ContentBlockProps) => (
   <div className={'w-full grid grid-cols-5'}>
     <span
       className={
