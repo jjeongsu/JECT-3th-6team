@@ -1,5 +1,5 @@
-import IconMinus from '@/assets/icons/normal/Icon_Minus.svg';
-import IconPlus from '@/assets/icons/normal/Icon_Plus.svg';
+import IconMinus from '@/assets/icons/Normal/Icon_Minus.svg';
+import IconPlus from '@/assets/icons/Normal/Icon_Plus.svg';
 import { NumberInputProps } from '@/shared/ui/input/types';
 
 export default function NumberInput({
