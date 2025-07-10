@@ -1,8 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import BackIcon from '/public/icons/Normal/Icon_Bracket_Left.svg';
+import IconBack from '@/assets/icons/Normal/Icon_Bracket_Left.svg';
 
 export default function PageHeader({ title }: { title: string }) {
   const router = useRouter();
@@ -14,13 +13,7 @@ export default function PageHeader({ title }: { title: string }) {
       }
     >
       <button onClick={() => router.back()}>
-        <Image
-          src={BackIcon}
-          width={24}
-          height={24}
-          objectFit={'cover'}
-          alt={'back icon'}
-        />
+        <IconBack width={24} height={24} fill={'var(--color-gray60)'} />
       </button>
       <span className={'font-medium text-base text-black select-none'}>
         {title}

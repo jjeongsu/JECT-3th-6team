@@ -1,31 +1,33 @@
-"use client"
+'use client';
 
-import { Badge } from "@/shared/ui/badge/Badge"
-import { Tag } from "@/shared/ui/tag/Tag"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DescriptionTab } from "@/features/detail/ui/DescriptionTab"
-import { ReviewTab } from "@/features/detail/ui/ReviewTab"
-import { ImageCarousel } from "@/features/detail/ui/ImageCarousel"
-import { SemiBoldText } from "@/shared/ui/text/SemiBoldText"
-import { MediumText } from "@/shared/ui/text/MediumText"
-import Image from "next/image"
+import { Badge } from '@/shared/ui/badge/Badge';
+import { Tag } from '@/shared/ui/tag/Tag';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DescriptionTab } from '@/features/detail/ui/DescriptionTab';
+import { ReviewTab } from '@/features/detail/ui/ReviewTab';
+import { ImageCarousel } from '@/features/detail/ui/ImageCarousel';
+import { SemiBoldText } from '@/shared/ui/text/SemiBoldText';
+import { MediumText } from '@/shared/ui/text/MediumText';
+import Image from 'next/image';
 
 export default function ProductDetail() {
-  const images = ["/images/sunglass.jpg", "/images/sunglass.jpg", "/images/sunglass.jpg"]
+  const images = [
+    '/images/sunglass.jpg',
+    '/images/sunglass.jpg',
+    '/images/sunglass.jpg',
+  ];
 
   return (
-    <div >
+    <div>
       {/* Image Carousel */}
       <ImageCarousel images={images} />
 
       {/* Main Detail */}
-      <div className="py-6 px-5"> 
+      <div className="py-6 px-5">
         {/* Badge and Rating */}
         <div className="flex items-center justify-between">
-          <Badge iconPosition="left">
-            10일 남음
-          </Badge>
-          <div className="flex items-center gap-1"> 
+          <Badge iconPosition="left">10일 남음</Badge>
+          <div className="flex items-center gap-1">
             <Image
               src="/icons/Normal/Icon_Star.svg"
               alt="star"
@@ -40,10 +42,10 @@ export default function ProductDetail() {
         {/* Title and Tags*/}
         <div className="mt-6">
           <SemiBoldText size="lg">젠틀몬스터</SemiBoldText>
-            <Tag>수도권</Tag>
-            <Tag>체험형</Tag>
-            <Tag>패션</Tag>
-            <Tag>뷰티</Tag>          
+          <Tag>수도권</Tag>
+          <Tag>체험형</Tag>
+          <Tag>패션</Tag>
+          <Tag>뷰티</Tag>
         </div>
         {/* Location */}
         <div className="flex items-center justify-between mt-2.5">
@@ -82,5 +84,5 @@ export default function ProductDetail() {
         <ReviewTab />
       </Tabs>
     </div>
-  )
+  );
 }

@@ -3,11 +3,19 @@
 import React from 'react';
 import Image from 'next/image';
 import ExImage from '/public/images/popup-ex.png';
-import IconMap from '/public/icons/Normal/Icon_map.svg';
+import IconMap from '@/assets/icons/Normal/Icon_map.svg';
 import { BottomButtonContainer, StandardButton } from '@/shared/ui';
 import { useRouter } from 'next/navigation';
 
-const ContentBlock: React.FC<ContentBlockProps> = ({ label, value }) => (
+type ContentBlockProps = {
+  label: string;
+  value: string | number;
+};
+
+const ContentBlock: React.FC<ContentBlockProps> = ({
+  label,
+  value,
+}: ContentBlockProps) => (
   <div className={'w-full grid grid-cols-5'}>
     <span
       className={
@@ -45,14 +53,7 @@ export default function ReservationSummaryView() {
               젠틀 몬스터 팝업
             </h2>
             <p className={'text-sm text-medium flex items-center gap-x-1'}>
-              {/*TODO : Icon 랜더링 방식 변경*/}
-              <Image
-                src={IconMap}
-                alt="map icon"
-                width={15}
-                height={17}
-                className={'object-cover'}
-              />
+              <IconMap width={15} height={17} fill={'var(--color-gray60)'} />
               <span>서울, 용산구 한남동 61-2</span>
             </p>
           </div>

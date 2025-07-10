@@ -1,6 +1,5 @@
-import Image from 'next/image';
-import IconMinus from '/public/icons/normal/Icon_Minus.svg';
-import IconPlus from '/public/icons/normal/Icon_Plus.svg';
+import IconMinus from '@/assets/icons/Normal/Icon_Minus.svg';
+import IconPlus from '@/assets/icons/Normal/Icon_Plus.svg';
 import { NumberInputProps } from '@/shared/ui/input/types';
 
 export default function NumberInput({
@@ -42,13 +41,7 @@ export default function NumberInput({
             className={'cursor-pointer'}
             onClick={onMinusClick}
           >
-            <Image
-              src={IconMinus}
-              alt="number minus button"
-              width={29}
-              height={29}
-              objectFit={'cover'}
-            />
+            <IconMinus width={29} height={29} fill={'var(--color-gray60)'} />
           </button>
 
           <span className={`text-xl min-w-3.5 font-regular ${numberStyle}`}>
@@ -61,13 +54,7 @@ export default function NumberInput({
             className={'cursor-pointer'}
             onClick={onPlusClick}
           >
-            <Image
-              src={IconPlus}
-              alt="number plus button"
-              width={29}
-              height={29}
-              objectFit={'cover'}
-            />
+            <IconPlus width={29} height={29} fill={'var(--color-gray60)'} />
           </button>
         </div>
       </div>

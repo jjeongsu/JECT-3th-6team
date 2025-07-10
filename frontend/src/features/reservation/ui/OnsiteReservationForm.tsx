@@ -8,8 +8,7 @@ import {
   TextInput,
 } from '@/shared/ui';
 import useForm from '../hook/useForm';
-import Image from 'next/image';
-import ReloadIcon from '/public/icons/Normal/Icon_Reload.svg';
+import IconReload from '@/assets/icons/Normal/Icon_Reload.svg';
 import {
   ERROR_CODE_MAP,
   MAX_HEAD_COUNT,
@@ -105,13 +104,7 @@ export default function OnsiteReservationForm({
           className={'rounded-[10px]'}
         >
           <div className={'flex items-center gap-x-2'}>
-            <Image
-              src={ReloadIcon}
-              width={17}
-              height={17}
-              alt={'reload'}
-              objectFit={'cover'}
-            />
+            <IconReload width={17} height={17} fill={'var(--color-gray60)'} />
             <span>초기화</span>
           </div>
         </StandardButton>
