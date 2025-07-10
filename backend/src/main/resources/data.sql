@@ -1,4 +1,3 @@
-
 -- ===================================
 -- ✅ [DATA] categories
 -- ===================================
@@ -11,15 +10,16 @@ VALUES (100, '패션'),
 -- ✅ [DATA] members
 -- ===================================
 
-INSERT INTO members (id)
-VALUES (1000),
-       (1001);
+INSERT INTO members (id, name, email, created_at, modified_at)
+VALUES (1000, 'test', 'test@test.com', '2025-05-05T06:10:11', '2025-05-05T06:10:11'),
+       (1001, 'test2', 'test2@test.com', '2025-05-05T06:10:11', '2025-05-05T06:10:11');
 
 -- ===================================
 -- ✅ [DATA] popup_locations
 -- ===================================
 
-INSERT INTO popup_locations (id, address_name, region_1depth_name, region_2depth_name, region_3depth_name, longitude, latitude)
+INSERT INTO popup_locations (id, address_name, region_1depth_name, region_2depth_name, region_3depth_name, longitude,
+                             latitude)
 VALUES (10, '경기도 성남시 분당구', '경기도', '성남시 분당구', '', 127.423084873712, 37.0789561558879);
 
 -- ===================================

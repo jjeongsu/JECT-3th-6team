@@ -1,83 +1,88 @@
 package com.example.demo.infrastructure.persistence.mapper;
 
-import com.example.demo.domain.model.*;
-import com.example.demo.domain.model.Period;
-import com.example.demo.domain.model.PopupDetail;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupEntity;
-import com.example.demo.domain.model.Rating;
-import com.example.demo.domain.model.SearchTags;
-import com.example.demo.domain.model.Sns;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupCategoryEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupImageEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupReviewEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupSocialEntity;
-import com.example.demo.infrastructure.persistence.entity.popup.PopupWeeklyScheduleEntity;
-import java.util.List;
+import com.example.demo.domain.model.DateRange;
+import com.example.demo.domain.model.Location;
+import com.example.demo.domain.model.popup.*;
 import com.example.demo.infrastructure.persistence.entity.popup.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * PopupDetail 도메인 모델과 PopupEntity 간의 변환을 담당하는 Mapper.
- */
 @Component
 public class PopupMapper {
-    /**
-     * PopupEntity를 PopupDetail 도메인 모델로 변환한다.
-     *
-     * @param entity PopupEntity
-     * @return PopupDetail 도메인 모델
-     */
-    public PopupDetail toDomain(PopupEntity entity) {
-        // PopupEntity의 실제 구조에 맞게 변환
-        // 현재는 기본적인 정보만 변환하고, 나머지는 null로 설정
-        return new PopupDetail(
-                entity.getId(),
-                entity.getTitle(),
-                null, // thumbnails
-                0, // dDay (계산 필요)
-                null, // rating
-                null, // searchTags
-                new Location(null, null, null, null, 0.0, 0.0), // location 정보는 별도 엔티티에서 조회 필요
-                new Period(entity.getStartDate(), entity.getEndDate()),
-                null, // brandStory
-                null  // popupDetail
-        );
+
+    // Entity List -> Domain
+    public Popup toDomain(
+            PopupEntity popupEntity,
+            PopupLocationEntity locationEntity,
+            List<PopupWeeklyScheduleEntity> scheduleEntities,
+            List<PopupImageEntity> imageEntities,
+            List<PopupContentEntity> contentEntities,
+            List<PopupSocialEntity> socialEntities,
+            List<PopupCategoryEntity> categoryEntities
+    ) {
+        return Popup.builder()
+                .id(popupEntity.getId())
+                .name(popupEntity.getTitle())
+                .location(toLocationDomain(locationEntity))
+                .schedule(toScheduleDomain(popupEntity, scheduleEntities))
+                .display(toDisplayDomain(imageEntities, contentEntities, socialEntities))
+                .type(toDomain(popupEntity.getType())) // Type conversion
+                .popupCategories(toCategoriesDomain(categoryEntities))
+                .status(null) // Status는 DB에 저장되지 않고, 도메인 로직으로 결정
+                .build();
     }
 
-    public SearchTags toSearchTags(String type, List<PopupCategoryEntity> categories) {
-        List<String> categoryNames = categories.stream()
-                .map(PopupCategoryEntity::getName)
-                .toList();
-        return new SearchTags(type, categoryNames);
+    private Location toLocationDomain(PopupLocationEntity entity) {
+        return new Location(entity.getAddressName(), entity.getRegion1DepthName(), entity.getRegion2DepthName(), entity.getRegion3DepthName(), entity.getLongitude(), entity.getLatitude());
     }
 
-    public Rating toRating(List<PopupReviewEntity> reviews) {
-        List<Integer> ratings = reviews.stream()
-                .map(PopupReviewEntity::getRating)
-                .toList();
-        return Rating.from(ratings);
+    private PopupSchedule toScheduleDomain(PopupEntity popupEntity, List<PopupWeeklyScheduleEntity> scheduleEntities) {
+        DateRange dateRange = new DateRange(popupEntity.getStartDate(), popupEntity.getEndDate());
+        List<OpeningHours> openingHours = scheduleEntities.stream()
+                .map(e -> new OpeningHours(e.getDayOfWeek(), e.getOpenTime(), e.getCloseTime()))
+                .collect(Collectors.toList());
+        return new PopupSchedule(dateRange, new WeeklyOpeningHours(openingHours));
     }
 
-    public BrandStory toBrandStory(List<PopupImageEntity> images, List<PopupSocialEntity> socials) {
-        List<String> imageUrls = images.stream()
-                .map(PopupImageEntity::getUrl)
-                .toList();
-
-        List<Sns> snsList = socials.stream()
-                .map(s -> new Sns(s.getIconUrl(), s.getLinkUrl()))
-                .toList();
-
-        return new BrandStory(imageUrls, snsList);
+    private PopupDisplay toDisplayDomain(List<PopupImageEntity> imageEntities, List<PopupContentEntity> contentEntities, List<PopupSocialEntity> socialEntities) {
+        List<String> imageUrls = imageEntities.stream().map(PopupImageEntity::getUrl).collect(Collectors.toList());
+        String introduction = contentEntities.stream().filter(e -> e.getSortOrder() == 1).findFirst().map(PopupContentEntity::getContentText).orElse("");
+        String notice = contentEntities.stream().filter(e -> e.getSortOrder() == 2).findFirst().map(PopupContentEntity::getContentText).orElse("");
+        PopupContent content = new PopupContent(introduction, notice);
+        List<Sns> sns = socialEntities.stream().map(e -> new Sns(e.getIconUrl(), e.getLinkUrl())).collect(Collectors.toList());
+        return new PopupDisplay(imageUrls, content, sns);
+    }
+    
+    private List<PopupCategory> toCategoriesDomain(List<PopupCategoryEntity> categoryEntities) {
+        return categoryEntities.stream()
+            .map(e -> new PopupCategory(e.getCategoryId(), e.getName()))
+            .collect(Collectors.toList());
     }
 
-    public List<DayOfWeekInfo> toDayOfWeekInfos(List<PopupWeeklyScheduleEntity> schedules) {
-        return schedules.stream()
-                .map(s -> new DayOfWeekInfo(
-                        s.getDayOfWeek().name(),
-                        s.getOpenTime() + " ~ " + s.getCloseTime()
-                ))
-                .toList();
+    // Domain -> Entity
+    public PopupEntity toPopupEntity(Popup popup) {
+        return PopupEntity.builder()
+                .id(popup.getId())
+                .title(popup.getName())
+                .popupLocationId(null) // location은 별도 저장 후 ID를 설정해야 함
+                .type(toEntity(popup.getType())) // Type conversion
+                .startDate(popup.getSchedule().dateRange().startDate())
+                .endDate(popup.getSchedule().dateRange().endDate())
+                .build();
     }
-}
+    
+    // Type conversion methods
+    private com.example.demo.domain.model.popup.PopupType toDomain(com.example.demo.infrastructure.persistence.entity.popup.PopupType entityType) {
+        if (entityType == null) return null;
+        return com.example.demo.domain.model.popup.PopupType.valueOf(entityType.name());
+    }
+
+    private com.example.demo.infrastructure.persistence.entity.popup.PopupType toEntity(com.example.demo.domain.model.popup.PopupType domainType) {
+        if (domainType == null) return null;
+        return com.example.demo.infrastructure.persistence.entity.popup.PopupType.valueOf(domainType.name());
+    }
+    
+    // ... 다른 도메인 -> 엔티티 매핑 메서드들
+} 

@@ -5,10 +5,16 @@ import com.example.demo.application.dto.WaitingCreateRequest;
 import com.example.demo.application.dto.WaitingCreateResponse;
 import com.example.demo.application.dto.WaitingResponse;
 import com.example.demo.application.mapper.WaitingDtoMapper;
-import com.example.demo.domain.model.*;
-import com.example.demo.domain.port.MemberRepository;
-import com.example.demo.domain.port.PopupRepository;
-import com.example.demo.domain.port.WaitingRepository;
+import com.example.demo.domain.model.DateRange;
+import com.example.demo.domain.model.Location;
+import com.example.demo.domain.model.Member;
+import com.example.demo.domain.model.popup.*;
+import com.example.demo.domain.model.waiting.Waiting;
+import com.example.demo.domain.model.waiting.WaitingQuery;
+import com.example.demo.domain.model.waiting.WaitingStatus;
+import com.example.demo.domain.port.MemberPort;
+import com.example.demo.domain.port.PopupPort;
+import com.example.demo.domain.port.WaitingPort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,8 +23,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,13 +38,13 @@ import static org.mockito.Mockito.*;
 class WaitingServiceTest {
 
     @Mock
-    private WaitingRepository waitingRepository;
+    private WaitingPort waitingPort;
 
     @Mock
-    private PopupRepository popupRepository;
+    private PopupPort popupPort;
 
     @Mock
-    private MemberRepository memberRepository;
+    private MemberPort memberPort;
 
     @Mock
     private WaitingDtoMapper waitingDtoMapper;
@@ -48,14 +56,49 @@ class WaitingServiceTest {
     @DisplayName("createWaiting 테스트")
     class Test01 {
         // 테스트용 유효한 데이터
-        private final PopupDetail validPopup = new PopupDetail(
-                1L, "테스트 팝업", List.of("thumbnail1.jpg"), 5,
-                new Rating(4.5, 100), new SearchTags("팝업", List.of("테스트")),
-                new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
-                new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
-                new BrandStory(List.of("brand1.jpg"), List.of()),
-                new PopupDetailInfo(List.of(), List.of("상세 설명"))
-        );
+        private final Popup validPopup = Popup.builder()
+                .id(1L)
+                .name("테스트 팝업")
+                .location(
+                        new Location(
+                                "서울시 강남구",
+                                "서울특별시",
+                                "강남구",
+                                "역삼동",
+                                127.0012,
+                                37.5665
+                        )
+                )
+                .schedule(
+                        new PopupSchedule(
+                                new DateRange(
+                                        LocalDate.now(),
+                                        LocalDate.now().plusDays(30)
+                                ),
+                                new WeeklyOpeningHours(
+                                        List.of(
+                                                new OpeningHours(
+                                                        DayOfWeek.MONDAY,
+                                                        LocalTime.now(),
+                                                        LocalTime.now().plusHours(1)
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .display(
+                        new PopupDisplay(
+                                List.of("http://image.com"),
+                                new PopupContent("팝업 설명", "팝업 공지"),
+                                List.of(new Sns("http://image.com", "http://sns.com"))
+                        )
+                )
+                .type(PopupType.EXHIBITION)
+                .popupCategories(
+                        List.of(new PopupCategory(1L, "예술"))
+                )
+                .status(PopupStatus.IN_PROGRESS)
+                .build();
 
         private final Member validMember = new Member(1L, "테스트 사용자", "test@example.com");
 
@@ -79,10 +122,10 @@ class WaitingServiceTest {
                     1L, "테스트 팝업", "홍길동", 2, "hong@example.com", nextWaitingNumber, registeredAt
             );
 
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
-            when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(nextWaitingNumber);
-            when(memberRepository.findById(1L)).thenReturn(Optional.of(validMember));
-            when(waitingRepository.save(any(Waiting.class))).thenReturn(savedWaiting);
+            when(popupPort.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(waitingPort.getNextWaitingNumber(1L)).thenReturn(nextWaitingNumber);
+            when(memberPort.findById(1L)).thenReturn(Optional.of(validMember));
+            when(waitingPort.save(any(Waiting.class))).thenReturn(savedWaiting);
             when(waitingDtoMapper.toCreateResponse(savedWaiting)).thenReturn(expectedResponse);
 
             // when
@@ -93,10 +136,10 @@ class WaitingServiceTest {
             assertEquals(expectedResponse, response);
 
             // verify
-            verify(popupRepository).findById(1L);
-            verify(waitingRepository).getNextWaitingNumber(1L);
-            verify(memberRepository).findById(1L);
-            verify(waitingRepository).save(any(Waiting.class));
+            verify(popupPort).findById(1L);
+            verify(waitingPort).getNextWaitingNumber(1L);
+            verify(memberPort).findById(1L);
+            verify(waitingPort).save(any(Waiting.class));
             verify(waitingDtoMapper).toCreateResponse(savedWaiting);
         }
 
@@ -104,7 +147,7 @@ class WaitingServiceTest {
         @DisplayName("존재하지 않는 팝업으로 대기 신청 시 예외 발생")
         public void test02() {
             // given
-            when(popupRepository.findById(999L)).thenReturn(Optional.empty());
+            when(popupPort.findById(999L)).thenReturn(Optional.empty());
 
             WaitingCreateRequest invalidRequest = new WaitingCreateRequest(
                     999L, 1L, "홍길동", 2, "hong@example.com"
@@ -119,10 +162,10 @@ class WaitingServiceTest {
             assertEquals("팝업을 찾을 수 없습니다: 999", exception.getMessage());
 
             // verify
-            verify(popupRepository).findById(999L);
-            verify(waitingRepository, never()).getNextWaitingNumber(any());
-            verify(memberRepository, never()).findById(any());
-            verify(waitingRepository, never()).save(any());
+            verify(popupPort).findById(999L);
+            verify(waitingPort, never()).getNextWaitingNumber(any());
+            verify(memberPort, never()).findById(any());
+            verify(waitingPort, never()).save(any());
             verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
 
@@ -130,9 +173,9 @@ class WaitingServiceTest {
         @DisplayName("존재하지 않는 회원으로 대기 신청 시 예외 발생")
         public void test03() {
             // given
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
-            when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(5);
-            when(memberRepository.findById(999L)).thenReturn(Optional.empty());
+            when(popupPort.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(waitingPort.getNextWaitingNumber(1L)).thenReturn(5);
+            when(memberPort.findById(999L)).thenReturn(Optional.empty());
 
             WaitingCreateRequest invalidRequest = new WaitingCreateRequest(
                     1L, 999L, "홍길동", 2, "hong@example.com"
@@ -147,10 +190,10 @@ class WaitingServiceTest {
             assertEquals("회원을 찾을 수 없습니다: 999", exception.getMessage());
 
             // verify
-            verify(popupRepository).findById(1L);
-            verify(waitingRepository).getNextWaitingNumber(1L);
-            verify(memberRepository).findById(999L);
-            verify(waitingRepository, never()).save(any());
+            verify(popupPort).findById(1L);
+            verify(waitingPort).getNextWaitingNumber(1L);
+            verify(memberPort).findById(999L);
+            verify(waitingPort, never()).save(any());
             verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
 
@@ -158,19 +201,19 @@ class WaitingServiceTest {
         @DisplayName("대기 정보 저장 시 예외 발생")
         public void test04() {
             // given
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
-            when(waitingRepository.getNextWaitingNumber(1L)).thenReturn(5);
-            when(memberRepository.findById(1L)).thenReturn(Optional.of(validMember));
-            when(waitingRepository.save(any(Waiting.class))).thenThrow(new RuntimeException("저장 실패"));
+            when(popupPort.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(waitingPort.getNextWaitingNumber(1L)).thenReturn(5);
+            when(memberPort.findById(1L)).thenReturn(Optional.of(validMember));
+            when(waitingPort.save(any(Waiting.class))).thenThrow(new RuntimeException("저장 실패"));
 
             // when & then
             assertThrows(RuntimeException.class, () -> waitingService.createWaiting(validRequest));
 
             // verify
-            verify(popupRepository).findById(1L);
-            verify(waitingRepository).getNextWaitingNumber(1L);
-            verify(memberRepository).findById(1L);
-            verify(waitingRepository).save(any(Waiting.class));
+            verify(popupPort).findById(1L);
+            verify(waitingPort).getNextWaitingNumber(1L);
+            verify(memberPort).findById(1L);
+            verify(waitingPort).save(any(Waiting.class));
             verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
 
@@ -178,17 +221,17 @@ class WaitingServiceTest {
         @DisplayName("대기 번호 조회 시 예외 발생")
         public void test05() {
             // given
-            when(popupRepository.findById(1L)).thenReturn(Optional.of(validPopup));
-            when(waitingRepository.getNextWaitingNumber(1L)).thenThrow(new RuntimeException("대기 번호 조회 실패"));
+            when(popupPort.findById(1L)).thenReturn(Optional.of(validPopup));
+            when(waitingPort.getNextWaitingNumber(1L)).thenThrow(new RuntimeException("대기 번호 조회 실패"));
 
             // when & then
             assertThrows(RuntimeException.class, () -> waitingService.createWaiting(validRequest));
 
             // verify
-            verify(popupRepository).findById(1L);
-            verify(waitingRepository).getNextWaitingNumber(1L);
-            verify(memberRepository, never()).findById(any());
-            verify(waitingRepository, never()).save(any());
+            verify(popupPort).findById(1L);
+            verify(waitingPort).getNextWaitingNumber(1L);
+            verify(memberPort, never()).findById(any());
+            verify(waitingPort, never()).save(any());
             verify(waitingDtoMapper, never()).toCreateResponse(any());
         }
     }
@@ -197,14 +240,49 @@ class WaitingServiceTest {
     @DisplayName("getVisitHistory 테스트")
     class Test02 {
         // 테스트용 유효한 데이터
-        private final PopupDetail validPopup = new PopupDetail(
-                1L, "테스트 팝업", List.of("thumbnail1.jpg"), 5,
-                new Rating(4.5, 100), new SearchTags("팝업", List.of("테스트")),
-                new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
-                new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
-                new BrandStory(List.of("brand1.jpg"), List.of()),
-                new PopupDetailInfo(List.of(), List.of("상세 설명"))
-        );
+        private final Popup validPopup = Popup.builder()
+                .id(1L)
+                .name("테스트 팝업")
+                .location(
+                        new Location(
+                                "서울시 강남구",
+                                "서울특별시",
+                                "강남구",
+                                "역삼동",
+                                127.0012,
+                                37.5665
+                        )
+                )
+                .schedule(
+                        new PopupSchedule(
+                                new DateRange(
+                                        LocalDate.now(),
+                                        LocalDate.now().plusDays(30)
+                                ),
+                                new WeeklyOpeningHours(
+                                        List.of(
+                                                new OpeningHours(
+                                                        DayOfWeek.MONDAY,
+                                                        LocalTime.now(),
+                                                        LocalTime.now().plusHours(1)
+                                                )
+                                        )
+                                )
+                        )
+                )
+                .display(
+                        new PopupDisplay(
+                                List.of("http://image.com"),
+                                new PopupContent("팝업 설명", "팝업 공지"),
+                                List.of(new Sns("http://image.com", "http://sns.com"))
+                        )
+                )
+                .type(PopupType.EXHIBITION)
+                .popupCategories(
+                        List.of(new PopupCategory(1L, "예술"))
+                )
+                .status(PopupStatus.IN_PROGRESS)
+                .build();
 
         private final Member validMember = new Member(1L, "테스트 사용자", "test@example.com");
 
@@ -225,8 +303,7 @@ class WaitingServiceTest {
             Waiting waiting2 = new Waiting(
                     2L, validPopup, "김철수", validMember,
                     "kim@example.com", 3, 2,
-                    WaitingStatus.COMPLETED, LocalDateTime.now().minusDays(1))
-                    ;
+                    WaitingStatus.COMPLETED, LocalDateTime.now().minusDays(1));
 
             List<Waiting> waitings = List.of(waiting1, waiting2);
 
@@ -244,7 +321,7 @@ class WaitingServiceTest {
 
             List<WaitingResponse> waitingResponses = List.of(waitingResponse1, waitingResponse2);
 
-            when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
+            when(waitingPort.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
             when(waitingDtoMapper.toResponse(waiting1)).thenReturn(waitingResponse1);
             when(waitingDtoMapper.toResponse(waiting2)).thenReturn(waitingResponse2);
 
@@ -258,7 +335,7 @@ class WaitingServiceTest {
             assertFalse(response.hasNext());
 
             // verify
-            verify(waitingRepository).findByQuery(any(WaitingQuery.class));
+            verify(waitingPort).findByQuery(any(WaitingQuery.class));
             verify(waitingDtoMapper).toResponse(waiting1);
             verify(waitingDtoMapper).toResponse(waiting2);
         }
@@ -279,7 +356,7 @@ class WaitingServiceTest {
             WaitingResponse waitingResponse1 = new WaitingResponse(1L, 1L, "테스트 팝업", "thumbnail1.jpg", "서울특별시, 강남구", new com.example.demo.application.dto.RatingResponse(4.5, 100), "6월 10일 ~ 6월 20일", 1, "RESERVED");
             WaitingResponse waitingResponse2 = new WaitingResponse(2L, 1L, "테스트 팝업", "thumbnail1.jpg", "서울특별시, 강남구", new com.example.demo.application.dto.RatingResponse(4.5, 100), "6월 10일 ~ 6월 20일", 2, "COMPLETED");
 
-            when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
+            when(waitingPort.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
             when(waitingDtoMapper.toResponse(waiting1)).thenReturn(waitingResponse1);
             when(waitingDtoMapper.toResponse(waiting2)).thenReturn(waitingResponse2);
 
@@ -293,7 +370,7 @@ class WaitingServiceTest {
             assertTrue(response.hasNext());
 
             // verify
-            verify(waitingRepository).findByQuery(any(WaitingQuery.class));
+            verify(waitingPort).findByQuery(any(WaitingQuery.class));
             verify(waitingDtoMapper).toResponse(waiting1);
             verify(waitingDtoMapper).toResponse(waiting2);
         }
@@ -308,7 +385,7 @@ class WaitingServiceTest {
 
             List<Waiting> emptyWaitings = List.of();
 
-            when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(emptyWaitings);
+            when(waitingPort.findByQuery(any(WaitingQuery.class))).thenReturn(emptyWaitings);
 
             // when
             VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
@@ -320,7 +397,7 @@ class WaitingServiceTest {
             assertFalse(response.hasNext());
 
             // verify
-            verify(waitingRepository).findByQuery(any(WaitingQuery.class));
+            verify(waitingPort).findByQuery(any(WaitingQuery.class));
             verify(waitingDtoMapper, never()).toResponse(any());
         }
 
@@ -346,7 +423,7 @@ class WaitingServiceTest {
                     "6월 10일 ~ 6월 20일", 1, "RESERVED"
             );
 
-            when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
+            when(waitingPort.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
             when(waitingDtoMapper.toResponse(waiting)).thenReturn(waitingResponse);
 
             // when
@@ -358,7 +435,7 @@ class WaitingServiceTest {
             assertEquals("RESERVED", response.content().getFirst().status());
 
             // verify
-            verify(waitingRepository).findByQuery(any(WaitingQuery.class));
+            verify(waitingPort).findByQuery(any(WaitingQuery.class));
             verify(waitingDtoMapper).toResponse(waiting);
         }
 
@@ -384,7 +461,7 @@ class WaitingServiceTest {
                     "6월 10일 ~ 6월 20일", 6, "RESERVED"
             );
 
-            when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
+            when(waitingPort.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
             when(waitingDtoMapper.toResponse(waiting)).thenReturn(waitingResponse);
 
             // when
@@ -396,7 +473,7 @@ class WaitingServiceTest {
             assertEquals(response.content().getLast().waitingId(), response.lastWaitingId());
 
             // verify
-            verify(waitingRepository).findByQuery(any(WaitingQuery.class));
+            verify(waitingPort).findByQuery(any(WaitingQuery.class));
             verify(waitingDtoMapper).toResponse(waiting);
         }
 
@@ -414,55 +491,8 @@ class WaitingServiceTest {
             );
 
             // verify
-            verify(waitingRepository, never()).findByQuery(any(WaitingQuery.class));
+            verify(waitingPort, never()).findByQuery(any(WaitingQuery.class));
             verify(waitingDtoMapper, never()).toResponse(any());
-        }
-
-        @Test
-        @DisplayName("방문 내역 조회 테스트 - 썸네일이 없는 팝업")
-        public void test07() {
-            // given
-            Integer size = 10;
-            Long lastWaitingId = null;
-            String status = null;
-
-            PopupDetail popupWithoutThumbnail = new PopupDetail(
-                    2L, "썸네일 없는 팝업", List.of(), 5,
-                    new Rating(4.0, 50), new SearchTags("팝업", List.of("테스트")),
-                    new Location("서울시 강남구", "서울특별시", "강남구", "역삼동", 127.0012, 37.5665),
-                    new Period(LocalDate.now(), LocalDate.now().plusDays(30)),
-                    new BrandStory(List.of("brand1.jpg"), List.of()),
-                    new PopupDetailInfo(List.of(), List.of("상세 설명"))
-            );
-
-            Waiting waiting = new Waiting(
-                    1L, popupWithoutThumbnail, "홍길동", validMember,
-                    "hong@example.com", 2, 1,
-                    WaitingStatus.RESERVED, LocalDateTime.now()
-            );
-
-            List<Waiting> waitings = List.of(waiting);
-
-            WaitingResponse waitingResponse = new WaitingResponse(
-                    1L, 2L, "썸네일 없는 팝업", null, "서울특별시, 강남구",
-                    new com.example.demo.application.dto.RatingResponse(4.0, 50),
-                    "6월 10일 ~ 6월 20일", 1, "RESERVED"
-            );
-
-            when(waitingRepository.findByQuery(any(WaitingQuery.class))).thenReturn(waitings);
-            when(waitingDtoMapper.toResponse(waiting)).thenReturn(waitingResponse);
-
-            // when
-            VisitHistoryCursorResponse response = waitingService.getVisitHistory(size, lastWaitingId, status);
-
-            // then
-            assertNotNull(response);
-            assertEquals(1, response.content().size());
-            assertNull(response.content().getFirst().popupImageUrl());
-
-            // verify
-            verify(waitingRepository).findByQuery(any(WaitingQuery.class));
-            verify(waitingDtoMapper).toResponse(waiting);
         }
     }
 }

@@ -3,12 +3,12 @@ package com.example.demo.infrastructure.persistence.mapper;
 import com.example.demo.domain.model.Member;
 import com.example.demo.infrastructure.persistence.entity.MemberEntity;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MemberMapperTest {
+class MemberEntityMapperTest {
 
     @Nested
     @DisplayName("toDomain 테스트")
@@ -19,13 +19,13 @@ class MemberMapperTest {
         public void test01() {
             // given
             MemberEntity entity = MemberEntity.builder()
-                .id(1L)
-                .email("test@example.com")
-                .name("테스트 사용자")
-                .build();
+                    .id(1L)
+                    .email("test@example.com")
+                    .name("테스트 사용자")
+                    .build();
 
             // when
-            Member result = new MemberMapper().toDomain(entity);
+            Member result = new MemberEntityMapper().toDomain(entity);
 
             // then
             assertNotNull(result);
@@ -39,13 +39,13 @@ class MemberMapperTest {
         public void test02() {
             // given
             MemberEntity entity = MemberEntity.builder()
-                .id(1L)
-                .email(null)
-                .name(null)
-                .build();
+                    .id(1L)
+                    .email(null)
+                    .name(null)
+                    .build();
 
             // when
-            Member result = new MemberMapper().toDomain(entity);
+            Member result = new MemberEntityMapper().toDomain(entity);
 
             // then
             assertNotNull(result);
@@ -59,13 +59,13 @@ class MemberMapperTest {
         public void test03() {
             // given
             MemberEntity entity = MemberEntity.builder()
-                .id(1L)
-                .email("")
-                .name("")
-                .build();
+                    .id(1L)
+                    .email("")
+                    .name("")
+                    .build();
 
             // when
-            Member result = new MemberMapper().toDomain(entity);
+            Member result = new MemberEntityMapper().toDomain(entity);
 
             // then
             assertNotNull(result);
