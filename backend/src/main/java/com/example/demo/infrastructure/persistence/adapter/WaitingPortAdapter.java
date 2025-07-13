@@ -8,11 +8,11 @@ import com.example.demo.domain.port.WaitingPort;
 import com.example.demo.infrastructure.persistence.entity.WaitingEntity;
 import com.example.demo.infrastructure.persistence.mapper.WaitingEntityMapper;
 import com.example.demo.infrastructure.persistence.repository.WaitingJpaRepository;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,6 +21,7 @@ public class WaitingPortAdapter implements WaitingPort {
     private final WaitingJpaRepository waitingJpaRepository;
     private final WaitingEntityMapper waitingEntityMapper;
     private final PopupPortAdapter popupPortAdapter; // 아키텍처 관점에선 다른 어뎁터를 참조하는게 별로 좋지 않지만, 중복 구현을 방지하려면 어쩔 수 없음
+    private final MemberPortAdapter memberPortAdapter;
 
     @Override
     public Waiting save(Waiting waiting) {
@@ -52,5 +53,16 @@ public class WaitingPortAdapter implements WaitingPort {
     @Override
     public Integer getNextWaitingNumber(Long popupId) {
         return waitingJpaRepository.findMaxWaitingNumberByPopupId(popupId).orElse(0) + 1;
+    }
+
+    @Override
+    public Optional<Waiting> findByMemberIdAndPopupId(Long memberId, Long popupId) {
+        return waitingJpaRepository.findByMemberIdAndPopupId(memberId, popupId)
+            .flatMap(entity -> {
+                var popup = popupPortAdapter.findById(entity.getPopupId()).orElse(null);
+                var member = memberPortAdapter.findById(entity.getMemberId()).orElse(null);
+                if (popup == null || member == null) return Optional.empty();
+                return Optional.of(waitingEntityMapper.toDomain(entity, popup, member));
+            });
     }
 } 
