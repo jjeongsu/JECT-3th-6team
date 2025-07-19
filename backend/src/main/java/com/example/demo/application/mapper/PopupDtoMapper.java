@@ -6,6 +6,8 @@ import com.example.demo.application.dto.popup.LocationResponse;
 import com.example.demo.application.dto.popup.PeriodResponse;
 import com.example.demo.application.dto.popup.PopupDetailInfoResponse;
 import com.example.demo.application.dto.popup.PopupFilterRequest;
+import com.example.demo.application.dto.popup.PopupMapRequest;
+import com.example.demo.application.dto.popup.PopupMapResponse;
 import com.example.demo.application.dto.popup.PopupSummaryResponse;
 import com.example.demo.application.dto.popup.SearchTagsResponse;
 import com.example.demo.application.dto.popup.SnsResponse;
@@ -15,16 +17,21 @@ import com.example.demo.domain.model.Location;
 import com.example.demo.domain.model.popup.OpeningHours;
 import com.example.demo.domain.model.popup.Popup;
 import com.example.demo.domain.model.popup.PopupCategory;
+import com.example.demo.domain.model.popup.PopupMapQuery;
 import com.example.demo.domain.model.popup.PopupQuery;
-import com.example.demo.domain.model.popup.Sns;
 import com.example.demo.domain.model.popup.PopupType;
+import com.example.demo.domain.model.popup.Sns;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 
 @Component
 public class PopupDtoMapper {
@@ -41,7 +48,6 @@ public class PopupDtoMapper {
                 .map(this::toDayOfWeekInfoResponse)
                 .collect(Collectors.toList());
 
-        // PopupDetailInfoResponse가 SNS를 포함하지 않으므로, 여기서는 introduction과 notice만 description으로 변환합니다.
         List<String> descriptions = List.of(
                 popup.getDisplay().content().introduction(),
                 popup.getDisplay().content().notice()
@@ -72,7 +78,6 @@ public class PopupDtoMapper {
         return new LocationResponse(location.addressName(), location.region1depthName(), location.region2depthName(), location.region3depthName(), location.longitude(), location.latitude());
     }
 
-    // BrandStory, Sns, Rating, SearchTags to DTO mappers
     public SnsResponse toSnsResponse(Sns sns) {
         if (sns == null) return null;
         return new SnsResponse(sns.icon(), sns.url());
@@ -100,39 +105,73 @@ public class PopupDtoMapper {
         return new SearchTagsResponse(type, categoryNames);
     }
 
+    public PopupMapQuery toPopupMapQuery(PopupMapRequest request) {
+        PopupType type = StringUtils.hasText(request.type()) ? PopupType.valueOf(request.type()) : null;
+        List<String> categories = StringUtils.hasText(request.category()) ?
+                Arrays.asList(request.category().split(",")) : null;
+        DateRange dateRange = (request.startDate() != null && request.endDate() != null) ?
+                new DateRange(request.startDate(), request.endDate()) : null;
+
+        return new PopupMapQuery(
+                request.minLatitude(),
+                request.maxLatitude(),
+                request.minLongitude(),
+                request.maxLongitude(),
+                type,
+                categories,
+                dateRange
+        );
+    }
+
+    public List<PopupMapResponse> toPopupMapResponses(List<Popup> popups) {
+        if (popups == null) {
+            return Collections.emptyList();
+        }
+        return popups.stream()
+                .map(this::toPopupMapResponse)
+                .collect(Collectors.toList());
+    }
+
+    private PopupMapResponse toPopupMapResponse(Popup popup) {
+        return new PopupMapResponse(
+                popup.getId(),
+                BigDecimal.valueOf(popup.getLocation().latitude()),
+                BigDecimal.valueOf(popup.getLocation().longitude())
+        );
+    }
+
     public PopupQuery toQuery(PopupFilterRequest request) {
         if (request.popupId() != null) {
             return PopupQuery.directPopupId(request.popupId());
         }
 
-        // 한글 타입명을 영어 Enum 값으로 매핑
         List<String> mappedTypes = null;
         if (request.type() != null) {
             mappedTypes = request.type().stream()
-                .map(type -> PopupType.fromKorean(type).name())
-                .toList();
+                    .map(type -> PopupType.fromKorean(type).name())
+                    .toList();
         }
 
         return PopupQuery.withFilters(
-            Optional.ofNullable(request.size()).orElse(10),
-            mappedTypes,
-            request.category(),
-            request.startDate(),
-            request.endDate(),
-            (request.region1DepthName() == null || "전국".equals(request.region1DepthName())) ? null : request.region1DepthName(),
-            request.lastPopupId()
+                Optional.ofNullable(request.size()).orElse(10),
+                mappedTypes,
+                request.category(),
+                request.startDate(),
+                request.endDate(),
+                (request.region1DepthName() == null || "전국".equals(request.region1DepthName())) ? null : request.region1DepthName(),
+                request.lastPopupId()
         );
     }
     public PopupSummaryResponse toPopupSummaryResponse(Popup popup) {
         if (popup == null) return null;
 
         return new PopupSummaryResponse(
-            popup.getId(),
-            popup.getName(),
-            popup.getDisplay().imageUrls().getFirst(),
-            toLocationResponse(popup.getLocation()),
-            calculateDDay(popup.getSchedule().dateRange().endDate()),
-            formatPeriod(popup.getSchedule().dateRange())
+                popup.getId(),
+                popup.getName(),
+                popup.getDisplay().imageUrls().getFirst(),
+                toLocationResponse(popup.getLocation()),
+                calculateDDay(popup.getSchedule().dateRange().endDate()),
+                formatPeriod(popup.getSchedule().dateRange())
         );
     }
     private long calculateDDay(LocalDate endDate) {
@@ -146,4 +185,4 @@ public class PopupDtoMapper {
         String end = period.endDate() != null ? period.endDate().format(DATE_FORMATTER) : "";
         return start + " ~ " + end;
     }
-} 
+}

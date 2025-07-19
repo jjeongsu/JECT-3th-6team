@@ -1,18 +1,24 @@
 package com.example.demo.application.service;
 
 import com.example.demo.application.dto.PopupDetailResponse;
+import com.example.demo.application.dto.popup.PopupMapRequest;
+import com.example.demo.application.dto.popup.PopupMapResponse;
 import com.example.demo.application.dto.popup.PopupFilterRequest;
 import com.example.demo.application.dto.popup.PopupSummaryResponse;
 import com.example.demo.application.dto.popup.PopupCursorResponse;
 import com.example.demo.application.mapper.PopupDtoMapper;
+
 import com.example.demo.domain.model.BrandStory;
 import com.example.demo.domain.model.popup.Popup;
+import com.example.demo.domain.model.popup.PopupMapQuery;
 import com.example.demo.domain.model.popup.PopupQuery;
 import com.example.demo.domain.model.waiting.Waiting;
 import com.example.demo.domain.model.waiting.WaitingStatus;
+
 import com.example.demo.domain.port.BrandStoryPort;
 import com.example.demo.domain.port.PopupPort;
 import com.example.demo.domain.port.WaitingPort;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -21,6 +27,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +38,13 @@ public class PopupService {
     private final PopupDtoMapper popupDtoMapper;
     private final WaitingPort waitingPort;
 
+    @Transactional(readOnly = true)
+    public List<PopupMapResponse> getPopupsOnMap(PopupMapRequest request) {
+        PopupMapQuery query = popupDtoMapper.toPopupMapQuery(request);
+        List<Popup> popups = popupPort.findByMapQuery(query);
+        return popupDtoMapper.toPopupMapResponses(popups);
+    }
+  
     @Transactional(readOnly = true)
     public PopupCursorResponse getFilteredPopups(PopupFilterRequest request) {
         // TODO: https://github.com/JECT-Study/JECT-3th-6team/pull/92#discussion_r2210591165
@@ -69,12 +83,12 @@ public class PopupService {
                 status
         );
     }
+
     private WaitingStatus calculateReservationStatus(Long popupId, Long memberId) {
         if (memberId == null) return WaitingStatus.NONE;
 
         return waitingPort.findByMemberIdAndPopupId(memberId, popupId)
-            .map(Waiting::status)
-            .orElse(WaitingStatus.NONE);
+                .map(Waiting::status)
+                .orElse(WaitingStatus.NONE);
     }
-
 } 
