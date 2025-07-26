@@ -15,6 +15,7 @@ import com.example.demo.domain.model.waiting.Waiting;
 import com.example.demo.domain.model.waiting.WaitingQuery;
 import com.example.demo.domain.model.waiting.WaitingStatus;
 import com.example.demo.domain.port.MemberPort;
+import com.example.demo.domain.port.NotificationPort;
 import com.example.demo.domain.port.PopupPort;
 import com.example.demo.domain.port.WaitingPort;
 import org.junit.jupiter.api.Disabled;
@@ -51,6 +52,12 @@ class WaitingServiceTest {
 
     @Mock
     private WaitingDtoMapper waitingDtoMapper;
+
+    @Mock
+    private WaitingNotificationService waitingNotificationService;
+
+    @Mock
+    private NotificationPort notificationPort;
 
     @InjectMocks
     private WaitingService waitingService;
