@@ -1,6 +1,8 @@
 package com.example.demo.presentation.controller;
 
 import com.example.demo.application.dto.member.MeResponse;
+import com.example.demo.common.exception.BusinessException;
+import com.example.demo.common.exception.ErrorType;
 import com.example.demo.common.security.UserPrincipal;
 import com.example.demo.common.util.CookieUtils;
 import com.example.demo.domain.model.Member;
@@ -26,10 +28,10 @@ public class MemberController {
     @GetMapping("/me")
     public ApiResponse<MeResponse> getMe(@AuthenticationPrincipal UserPrincipal principal) {
         if (principal == null) {
-            throw new IllegalStateException("인증된 사용자 정보를 가져올 수 없습니다.");
+            throw new BusinessException(ErrorType.AUTHENTICATION_REQUIRED);
         }
         Member member = memberPort.findById(principal.getId())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다: " + principal.getId()));
+                .orElseThrow(() -> new BusinessException(ErrorType.MEMBER_NOT_FOUND, String.valueOf(principal.getId())));
         return new ApiResponse<>("사용자 정보 조회 성공", MeResponse.from(member));
     }
 
