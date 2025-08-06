@@ -1,36 +1,34 @@
+'use client';
+
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
-import getNotificationsApi, {
-  NotificationRequest,
-  NotificationResponse,
-} from '@/features/notification/api/getNotificationsApi';
+import getPopupHistoryListApi, {
+  TaggedPopupHistoryListResponse,
+} from '@/features/history/api/getPopupHistoryListApi';
 import { useQueryEffects } from '@/shared/hook/useQueryEffect';
 import handleNetworkError from '@/shared/lib/handleNetworkError';
 
-export default function useNotificationList() {
-  const initialRequest: Omit<NotificationRequest, 'lastNotificationId'> = {
+export default function usePopupHistoryList() {
+  const initialRequest = {
     size: 10,
-    readStatus: 'ALL',
-    sort: 'UNREAD_FIRST',
   };
 
   const query = useSuspenseInfiniteQuery({
-    queryKey: ['notification', 'list'],
+    queryKey: ['popup-history', 'list'],
     queryFn: ({ pageParam = null }) => {
       const request =
         pageParam !== null
-          ? { ...initialRequest, lastNotificationId: pageParam }
+          ? { ...initialRequest, lastWaitingId: pageParam }
           : initialRequest;
-      return getNotificationsApi({ ...request });
+      return getPopupHistoryListApi({ ...request });
     },
-    getNextPageParam: (lastPage: NotificationResponse) =>
-      lastPage.hasNext ? lastPage.lastNotificationId : null,
+    gcTime: 1000 * 60 * 30, // 30분
+    staleTime: 1000 * 60 * 10, // 10분,
+    getNextPageParam: (lastPage: TaggedPopupHistoryListResponse) =>
+      lastPage.hasNext ? lastPage.lastWaitingId : null,
     initialPageParam: null,
-    gcTime: 1000 * 60 * 5, // 5분
-    staleTime: 1000 * 60, // 1분
     retry: 1,
   });
 
-  // TODO : 중복되는 로직 공통으로 빼기
   useQueryEffects(query, {
     onSuccess: data => {
       if (process.env.NEXT_PUBLIC_ENV === 'DEVELOP') {

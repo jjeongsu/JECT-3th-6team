@@ -1,21 +1,20 @@
 'use client';
 
-import useNotificationList from '@/features/notification/hook/useNotificationList';
+import PopupListView from '@/entities/popup/ui/PopupListView';
+import usePopupHistoryList from '@/features/history/hooks/usePopupHistoryList';
 import { useIntersectionObserver } from '@/shared/hook/useIntersectionObserver';
-import NotificationCardListView from '@/features/notification/ui/NotificationCardListView';
 
-export default function NotificationCardList() {
+export default function PopupHistoryList() {
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useNotificationList();
+    usePopupHistoryList();
   const lastElementRef = useIntersectionObserver(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   });
-
   return (
     <div className="flex flex-col">
-      <NotificationCardListView data={data.content} />
+      <PopupListView data={data.content} />
       {hasNextPage && <div ref={lastElementRef} className="h-4 " />}
     </div>
   );
