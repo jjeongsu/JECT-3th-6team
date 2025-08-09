@@ -85,7 +85,7 @@ public class EmailTemplateService {
                         </a>
                     </p>
                     <p>🌐 스팟잇 더 알아보기: 
-                        <a href="https://spotit.co.kr" style="color: #FF6B35; text-decoration: none;">
+                        <a href="https://www.spotit.co.kr" style="color: #FF6B35; text-decoration: none;">
                             웹사이트 방문
                         </a>
                     </p>
