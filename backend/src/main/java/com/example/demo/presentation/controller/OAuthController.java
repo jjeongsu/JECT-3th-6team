@@ -36,7 +36,6 @@ public class OAuthController {
         HttpServletResponse response) throws IOException {
 
         if (error != null) {
-            log.error("error: {}", error);
             oAuth2FailureHandler.handleFailure(response, new BusinessException(ErrorType.OAUTH_ERROR_RECEIVED, error));
             return;
         }
@@ -45,7 +44,6 @@ public class OAuthController {
             Member member = oAuth2Service.processKakaoLogin(code);
             oAuth2SuccessHandler.onAuthenticationSuccess(response, member, state, frontendUrl);
         } catch (Exception e) {
-            log.error("in catch - error: {}", error);
             oAuth2FailureHandler.handleFailure(response, e);
         }
     }
