@@ -310,6 +310,7 @@ VALUES (1, 1, '무신사와 나이키의 특별한 협업으로 탄생한 한정
 -- ===================================
 
 INSERT INTO popup_socials (id, popup_id, icon_url, link_url, sort_order)
+
 VALUES (1, 1, 'Instagram', 'https://instagram.com/musinsa_official', 1),
        (2, 1, 'Facebook', 'https://facebook.com/musinsa', 2),
        (3, 2, 'Instagram', 'https://instagram.com/adidas_originals', 1),
