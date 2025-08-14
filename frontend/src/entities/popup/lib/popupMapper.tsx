@@ -25,6 +25,7 @@ const mapPopupListItemToViewProps = (
   data: PopupListItemType
 ): PopupCardViewProps => {
   const renderedBadge = <PopupBadge data={data} />;
+
   const { startDate, endDate } = periodStringToDate(data.period);
   const renderedPeriod = dateToPeriodKRString(startDate, endDate);
 
