@@ -1,0 +1,59 @@
+name: Sync from upstream develop
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # 5분마다 (UTC 기준)  ← 한국시간과 9시간 차이
+  workflow_dispatch:        # 필요 시 수동 실행
+
+permissions:
+  contents: write           # GITHUB_TOKEN으로 push하려면 써주는 게 안전
+
+concurrency:
+  group: sync-upstream-develop
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream & fetch develop
+        run: |
+          git remote add upstream https://github.com/JECT-Study/JECT-3th-6team.git
+          git fetch upstream develop
+
+      - name: Ensure local develop exists
+        run: |
+          if ! git show-ref --quiet refs/heads/develop; then
+            git checkout -b develop
+          else
+            git checkout develop
+          fi
+
+      - name: Fast-forward merge (no conflicts)
+        run: |
+          # 변경 없으면 0으로 종료시키고 다음 push 건너뛰기 위해 파일 표시
+          if git merge --ff-only upstream/develop >/dev/null 2>&1; then
+            echo "NEED_PUSH=true" >> $GITHUB_ENV
+          else
+            echo "No fast-forward (diverged or up-to-date)."
+            if git rev-list --left-right --count upstream/develop...develop | awk '{exit $1==0}'; then
+              # 완전 동일 → push 불필요
+              echo "NEED_PUSH=false" >> $GITHUB_ENV
+            else
+              # 분기 발생 시 안전상 PR 경로로 돌리고 종료 (원하면 --force-with-lease로 바꿔도 됨)
+              echo "⚠️ develop이 분기되어 fast-forward 불가. 수동 정리나 PR 동기화 필요."
+              exit 0
+            fi
+          fi
+
+      - name: Push to origin (your fork)
+        if: env.NEED_PUSH == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin develop
