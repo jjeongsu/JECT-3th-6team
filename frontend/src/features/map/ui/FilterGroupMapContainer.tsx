@@ -148,7 +148,7 @@ export default function FilterGroupMapContainer() {
     ],
   };
 
-  const { data: popupList } = useQuery({
+  const { data: popupList, isLoading: isPopupListLoading } = useQuery({
     queryKey: ['mapPopupList', popupType, category],
     queryFn: async () => {
       console.log('🔄 API 요청 시도...');
@@ -243,20 +243,44 @@ export default function FilterGroupMapContainer() {
             level={3}
             className="w-full h-full"
           >
-            {popupList?.popupList?.map(popup => (
-              <MapMarker
-                key={popup.id}
-                position={{ lat: popup.latitude, lng: popup.longitude }}
-                image={{
-                  src:
-                    selectedPopupId === popup.id
-                      ? selectedPopupIconSrc
-                      : popupListIconSrc,
-                  size: { width: 32, height: 32 },
-                }}
-                onClick={() => handleMarkerClick(popup.id)}
-              />
-            ))}
+            {(() => {
+              const markerData =
+                popupList?.popupList || mockPopupList.popupList;
+              console.log(
+                '🐛 Debug - Rendering markers, isLoading:',
+                isPopupListLoading
+              );
+              console.log('🐛 Debug - markerData:', markerData);
+
+              if (isPopupListLoading) {
+                console.log('🐛 Debug - Still loading, not rendering markers');
+                return null;
+              }
+
+              if (!markerData || markerData.length === 0) {
+                console.log('🐛 Debug - No marker data available');
+                return null;
+              }
+
+              console.log('🐛 Debug - Rendering', markerData.length, 'markers');
+              return markerData.map(popup => {
+                console.log('🐛 Debug - Rendering marker:', popup);
+                return (
+                  <MapMarker
+                    key={popup.id}
+                    position={{ lat: popup.latitude, lng: popup.longitude }}
+                    image={{
+                      src:
+                        selectedPopupId === popup.id
+                          ? selectedPopupIconSrc
+                          : popupListIconSrc,
+                      size: { width: 32, height: 32 },
+                    }}
+                    onClick={() => handleMarkerClick(popup.id)}
+                  />
+                );
+              });
+            })()}
           </KakaoMap>
         </>
       )}
